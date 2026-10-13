@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}[hidden]{display:none!important}</style>
+<title>Techo de telas del patio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: maqueta 3D a pantalla completa + panel de cálculo a la derecha (abajo en celular) */
+:root{
+  --bg:#EEF0EC; --panel:#FAFBF8; --ink:#1C2129; --muted:#5E6673; --line:#D5D9D2;
+  --accent:#B88A1E; --accent-soft:#F1E4C2; --warn:#A33A1C; --warn-soft:#F7E1D8;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#13161B; --panel:#1A1E25; --ink:#E9ECEF; --muted:#9AA3AF; --line:#2C323C;
+  --accent:#E0B54C; --accent-soft:#3A3120; --warn:#F09A7A; --warn-soft:#3A221B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#13161B; --panel:#1A1E25; --ink:#E9ECEF; --muted:#9AA3AF; --line:#2C323C;
+  --accent:#E0B54C; --accent-soft:#3A3120; --warn:#F09A7A; --warn-soft:#3A221B; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 380px;height:100%}
+.stage{position:relative;min-width:0;min-height:0;overflow:hidden}
+#c{display:block;width:100%;height:100%;touch-action:none}
+.views{position:absolute;left:16px;top:16px;display:flex;gap:6px;flex-wrap:wrap;max-width:calc(100% - 32px)}
+.views button{font:500 12px var(--body);border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 11px;border-radius:999px;cursor:pointer}
+.views button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{position:absolute;left:16px;bottom:14px;font:400 11px var(--mono);color:var(--muted);background:color-mix(in srgb,var(--panel) 80%,transparent);padding:4px 8px;border-radius:6px}
+aside{background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;padding-inline:20px;padding-block:22px 28px;display:flex;flex-direction:column;gap:22px;min-width:0}
+h1{font:700 26px/1.05 var(--display);font-stretch:80%;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0;line-height:1.45}
+.lbl{font:600 11px var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.group{display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.val{font:500 13px var(--mono);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+select,input[type=number]{font:500 13px var(--body);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;min-width:0}
+input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:3px}
+.total{background:var(--accent-soft);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.total .big{font:800 44px/1 var(--display);font-stretch:75%;font-variant-numeric:tabular-nums}
+.total .big small{font:600 16px var(--body);margin-left:4px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.split div{display:flex;flex-direction:column;gap:2px}
+.split b{font:500 15px var(--mono);font-variant-numeric:tabular-nums}
+.split span{font-size:12px;color:var(--muted)}
+.fab{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.fab h2{margin:0;font:700 15px var(--display);display:flex;align-items:center;gap:8px}
+.sw{width:14px;height:14px;border-radius:4px;border:1px solid var(--line);display:inline-block}
+.grid3{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.note{font-size:12px;color:var(--muted);line-height:1.45;margin:0}
+.warn{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:12.5px;line-height:1.45;margin:0}
+.heights{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:13px}
+.heights b{font:500 13px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.tbl{max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.tbl table{width:100%;border-collapse:collapse;font:400 12px var(--mono);font-variant-numeric:tabular-nums}
+.tbl td,.tbl th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{font:600 11px var(--body);color:var(--muted);position:sticky;top:0;background:var(--panel)}
+.tbl tr.tot td{font-weight:500;color:var(--ink);border-top:1px solid var(--ink)}
+.check{display:flex;gap:8px;align-items:center;cursor:pointer}
+.check input{accent-color:var(--accent);width:16px;height:16px}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr;grid-template-rows:62vh auto;height:auto}
+  html,body{height:auto}
+  aside{border-left:0;border-top:1px solid var(--line);overflow:visible}
+  .grid3{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="stage">
+    <canvas id="c" aria-label="Maqueta 3D del patio con el techo de telas, el mosquitero y la lámpara"></canvas>
+    <div class="views" role="group" aria-label="Vistas">
+      <button data-view="guest" aria-pressed="true">Vista del invitado</button>
+      <button data-view="center" aria-pressed="false">Centro y fuente</button>
+      <button data-view="iso" aria-pressed="false">Maqueta</button>
+      <button data-view="top" aria-pressed="false">Planta</button>
+    </div>
+    <div class="hint">Arrastra para girar · rueda o pellizco para acercar</div>
+  </div>
+
+  <aside>
+    <div>
+      <h1>Techo de telas del patio</h1>
+      <p class="sub">Patio de 15.3 × 15.3 m. Cable perimetral y cruz de cables a 5 m, al nivel del piso del segundo piso, donde empieza el barandal. Dos telas intercaladas en el mismo cable: cada tira cruza de una orilla a la opuesta pasando por el centro, y alternan A, B, A, B para formar las franjas hacia el centro.</p>
+    </div>
+
+    <div class="total" aria-live="polite">
+      <span class="lbl">Tela necesaria (A + B)</span>
+      <div class="big"><span id="tMeters">—</span><small>m</small></div>
+      <div class="split">
+        <div><b id="tA">—</b><span id="tAr"></span></div>
+        <div><b id="tB">—</b><span id="tBr"></span></div>
+      </div>
+    </div>
+
+    <div class="fab" id="fabA">
+      <h2><span class="sw" id="swA"></span>Tela A</h2>
+      <select id="presetA" aria-label="Tela A"></select>
+      <div class="grid3">
+        <div class="field"><label class="lbl" for="wA">Ancho</label><input id="wA" type="number" step="0.05" min="0.3"></div>
+        <div class="field"><label class="lbl" for="rollA">Rollo</label><input id="rollA" type="number" step="1" min="5"></div>
+        <div class="field"><label class="lbl" for="priceA">$/m</label><input id="priceA" type="number" step="0.01" min="0"></div>
+        <div class="field"><label class="lbl" for="colA">Color</label><input id="colA" type="color"></div>
+      </div>
+    </div>
+    <div class="fab" id="fabB">
+      <h2><span class="sw" id="swB"></span>Tela B</h2>
+      <select id="presetB" aria-label="Tela B"></select>
+      <div class="grid3">
+        <div class="field"><label class="lbl" for="wB">Ancho</label><input id="wB" type="number" step="0.05" min="0.3"></div>
+        <div class="field"><label class="lbl" for="rollB">Rollo</label><input id="rollB" type="number" step="1" min="5"></div>
+        <div class="field"><label class="lbl" for="priceB">$/m</label><input id="priceB" type="number" step="0.01" min="0"></div>
+        <div class="field"><label class="lbl" for="colB">Color</label><input id="colB" type="color"></div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div><b id="sStrips">—</b><span>tiras (A + B)</span></div>
+      <div><b id="sAvg">—</b><span>largo promedio</span></div>
+      <div><b id="sMin">—</b><span>más corta (centro de lado)</span></div>
+      <div><b id="sMax">—</b><span>más larga (esquina)</span></div>
+    </div>
+
+    <div class="group">
+      <span class="lbl">Montaje</span>
+      <div class="field">
+        <div class="row"><label for="full">Fruncido (pliegues)</label><span class="val" id="vFull"></span></div>
+        <input id="full" type="range" min="1" max="3" step="0.1" value="2">
+      </div>
+      <div class="field">
+        <div class="row"><label for="sag">Caída al medio</label><span class="val" id="vSag"></span></div>
+        <input id="sag" type="range" min="0" max="2" step="0.1" value="1">
+      </div>
+      <div class="field">
+        <div class="row"><label for="tie">Amarre por extremo</label><span class="val" id="vTie"></span></div>
+        <input id="tie" type="range" min="0" max="1.5" step="0.05" value="0.7">
+      </div>
+      <label class="check"><input type="checkbox" id="one"> Resaltar una tira en la maqueta</label>
+      <label class="check"><input type="checkbox" id="cables" checked> Mostrar cables</label>
+    </div>
+
+    <div class="group">
+      <span class="lbl">Centro: mosquitero y lámpara</span>
+      <div class="field">
+        <div class="row"><label for="drop">Cable que baja del centro</label><span class="val" id="vDrop"></span></div>
+        <input id="drop" type="range" min="0.3" max="4.5" step="0.1" value="3">
+      </div>
+      <div class="field">
+        <div class="row"><label for="gap">Separación aro → lámpara</label><span class="val" id="vGap"></span></div>
+        <input id="gap" type="range" min="0" max="2.5" step="0.1" value="1">
+      </div>
+      <div class="field">
+        <div class="row"><label for="fh">Altura de la fuente (estimada)</label><span class="val" id="vFh"></span></div>
+        <input id="fh" type="range" min="1.5" max="4" step="0.1" value="2.6">
+      </div>
+      <div class="heights" id="heights"></div>
+      <p class="warn" id="warn" hidden></p>
+      <p class="note">Mosquitero: aro de 1 m de diámetro y 5 m de tela. Lámpara de papel de 1 m de diámetro colgada dentro.</p>
+    </div>
+
+    <div class="group">
+      <span class="lbl">Presupuesto de tela</span>
+      <div class="tbl"><table><thead><tr><th>Tela</th><th>Por metro</th><th>Por rollos</th></tr></thead><tbody id="budget"></tbody></table></div>
+    </div>
+
+    <div class="group">
+      <span class="lbl">Cable</span>
+      <div class="tbl"><table><thead><tr><th>Tramo</th><th>Largo</th><th>Con amarres</th></tr></thead><tbody id="cableTbl"></tbody></table></div>
+      <p class="note">Amarres: 0.5 m por cada extremo de cable. El cable eléctrico es un estimado si bajas por una esquina a un contacto en el piso.</p>
+    </div>
+
+    <div class="group">
+      <span class="lbl">Plan de corte por rollo</span>
+      <div class="tbl"><table><thead><tr><th>Rollo</th><th>Cortes (m)</th><th>Sobra</th></tr></thead><tbody id="cuts"></tbody></table></div>
+      <p class="note">Cada largo ya incluye la caída y los dos amarres. Las tiras de esquina miden más porque recorren la diagonal.</p>
+    </div>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+const SIDE=15.3, A=SIDE/2, PER=4*SIDE, HALF=PER/2, H_CABLE=5;
+const NET_R=.5, NET_LEN=5, LAMP_R=.5, BASIN_R=2.0, TIE_C=.5;
+const PRESETS={
+  organza:{name:"Organza lisa · 1.50 m",w:1.5,roll:50,price:29.99,op:.62},
+  tul70:{name:"Tul 70 liso · 1.40 m",w:1.4,roll:50,price:19.99,op:.42},
+  tulnovia:{name:"Tul de novia · 2.80 m",w:2.8,roll:50,price:0,op:.36},
+  otra:{name:"Otra tela · 1.60 m",w:1.6,roll:50,price:0,op:.75}
+};
+const $=id=>document.getElementById(id);
+const st={full:2,sag:1,tie:.7,one:false,drop:3,gap:1,fh:2.6,
+  A:{preset:"organza",w:1.5,roll:50,price:29.99,color:"#fbf8f1"},
+  B:{preset:"tul70",w:1.4,roll:50,price:19.99,color:"#e7d6ae"}};
+
+function perimPoint(s){ s=((s%PER)+PER)%PER; const side=Math.floor(s/SIDE); const t=s-side*SIDE-A;
+  return [[t,-A],[A,t],[-t,A],[-A,-t]][side]; }
+function arcLen(L,d){ if(d<=1e-6) return L; const k=4*d/L; return (L/2)*Math.sqrt(1+k*k)+(L*L/(8*d))*Math.asinh(k); }
+
+// strips alternate A,B; each takes perimeter space proportional to its width
+function layout(){
+  let P=Math.ceil(HALF*st.full/(st.A.w+st.B.w)); if(P%2) P++; P=Math.max(2,P);
+  const unit=HALF/(P*(st.A.w+st.B.w)); const strips=[]; let s=0;
+  for(let p=0;p<P;p++) for(const m of ["A","B"]){ const seg=st[m].w*unit; strips.push({m,s0:s,s1:s+seg}); s+=seg; }
+  strips.forEach(x=>{ const [px,pz]=perimPoint((x.s0+x.s1)/2); x.len=2*arcLen(Math.hypot(px,pz),st.sag)+2*st.tie; });
+  return {P,strips,realFull:1/unit};
+}
+function pack(lens,roll){ const rolls=[]; [...lens].sort((a,b)=>b-a).forEach(L=>{
+  if(L>roll){ rolls.push({cuts:[L],used:L,over:true}); return; }
+  const r=rolls.find(r=>!r.over&&r.used+L<=roll+1e-9); if(r){r.cuts.push(L);r.used+=L;} else rolls.push({cuts:[L],used:L}); }); return rolls; }
+function compute(){
+  const L=layout(); const out={L};
+  ["A","B"].forEach(m=>{ const lens=L.strips.filter(x=>x.m===m).map(x=>x.len); const total=lens.reduce((a,b)=>a+b,0);
+    out[m]={lens,total,rolls:pack(lens,st[m].roll)}; });
+  return out;
+}
+function centerInfo(){
+  const ring=H_CABLE-st.drop, lampTop=ring-st.gap, lampBot=lampTop-2*LAMP_R;
+  const rb=Math.max(NET_R+.35*Math.min(ring,NET_LEN), BASIN_R+.2);
+  const slant=Math.hypot(ring, rb-NET_R);
+  return {ring,lampTop,lampBot,rb,slant,pool:NET_LEN-slant};
+}
+function cableRows(){
+  const diag=SIDE*Math.SQRT2, elec=st.gap+st.drop+diag/2+H_CABLE+2;
+  return [["Perimetral (a 5 m)",PER,PER+2*TIE_C],["Cruz en X (2 diagonales)",2*diag,2*diag+4*TIE_C],
+    ["Bajada central al mosquitero",st.drop,st.drop+2*TIE_C],["Cuelgue de la lámpara",st.gap,st.gap+2*TIE_C],
+    ["Cable eléctrico lámpara (est.)",elec,elec]];
+}
+const fmt=(n,d=1)=>n.toLocaleString("es-MX",{minimumFractionDigits:d,maximumFractionDigits:d});
+const money=n=>"$"+n.toLocaleString("es-MX",{minimumFractionDigits:0,maximumFractionDigits:0});
+const nm=m=>PRESETS[st[m].preset].name.split(" · ")[0];
+
+function renderPanel(){
+  const r=compute(), all=[...r.A.lens,...r.B.lens];
+  $("vFull").textContent=fmt(st.full)+"×"; $("vSag").textContent=fmt(st.sag)+" m"; $("vTie").textContent=fmt(st.tie,2)+" m";
+  $("tMeters").textContent=fmt(Math.ceil(r.A.total+r.B.total),0);
+  ["A","B"].forEach(m=>{ $("t"+m).textContent=m+": "+fmt(Math.ceil(r[m].total),0)+" m";
+    $("t"+m+"r").textContent=nm(m)+" · "+r[m].lens.length+" tiras · "+r[m].rolls.length+" rollos de "+st[m].roll+" m";
+    $("sw"+m).style.background=st[m].color; });
+  $("sStrips").textContent=r.A.lens.length+" + "+r.B.lens.length;
+  $("sAvg").textContent=fmt(all.reduce((a,b)=>a+b,0)/all.length)+" m";
+  $("sMin").textContent=fmt(Math.min(...all))+" m"; $("sMax").textContent=fmt(Math.max(...all))+" m";
+  let tm=0,tr=0,missing=false;
+  $("budget").innerHTML=["A","B"].map(m=>{ const p=st[m].price; if(!p) missing=true;
+    const a=r[m].total*p, b=r[m].rolls.length*st[m].roll*p; tm+=a; tr+=b;
+    return "<tr><td>"+m+" · "+nm(m)+"</td><td>"+(p?money(a):"falta precio")+"</td><td>"+(p?money(b):"—")+"</td></tr>"; }).join("")+
+    "<tr class='tot'><td>Total"+(missing?" (incompleto)":"")+"</td><td>"+money(tm)+"</td><td>"+money(tr)+"</td></tr>";
+  const c=centerInfo();
+  $("vDrop").textContent=fmt(st.drop)+" m"; $("vGap").textContent=fmt(st.gap)+" m"; $("vFh").textContent=fmt(st.fh)+" m";
+  const reach=c.pool>=0?"llega al piso, sobran "+fmt(c.pool)+" m":"queda a "+fmt(-c.pool*c.ring/c.slant)+" m del piso";
+  $("heights").innerHTML="<span>Aro del mosquitero</span><b>"+fmt(c.ring)+" m</b><span>Lámpara (arriba → abajo)</span><b>"+fmt(c.lampTop)+" → "+fmt(c.lampBot)+" m</b><span>Punta de la fuente</span><b>"+fmt(st.fh)+" m</b><span>Tela del mosquitero</span><b>"+reach+"</b>";
+  const w=[];
+  if(c.ring<st.fh) w.push("El aro queda "+fmt(st.fh-c.ring)+" m por debajo de la punta de la fuente: la fuente atravesaría el mosquitero.");
+  if(c.lampBot<st.fh) w.push("La lámpara queda a la altura de la fuente y del agua.");
+  if(c.lampBot<0) w.push("La lámpara toca el piso.");
+  $("warn").hidden=!w.length; $("warn").textContent=w.join(" ");
+  const cr=cableRows();
+  $("cableTbl").innerHTML=cr.map(x=>"<tr><td>"+x[0]+"</td><td>"+fmt(x[1])+" m</td><td>"+fmt(x[2])+" m</td></tr>").join("")+
+    "<tr class='tot'><td>Total cable de acero</td><td></td><td>"+fmt(cr.slice(0,4).reduce((a,x)=>a+x[2],0))+" m</td></tr>";
+  $("cuts").innerHTML=["A","B"].map(m=>r[m].rolls.map((x,i)=>"<tr><td>"+m+(i+1)+"</td><td>"+x.cuts.map(c=>fmt(c)).join(" · ")+(x.over?" (más largo que el rollo)":"")+"</td><td>"+(x.over?"—":fmt(st[m].roll-x.used))+"</td></tr>").join("")).join("");
+}
+
+// ---------- scene ----------
+const canvas=$("c");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(60,1,.1,200);
+const controls=new THREE.OrbitControls(camera,canvas); controls.enableDamping=true; controls.maxDistance=60; controls.minDistance=1;
+const hemi=new THREE.HemisphereLight(0xffffff,0x9a9384,.85); scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff2dc,.75); sun.position.set(12,25,8); scene.add(sun);
+const mq=matchMedia("(prefers-color-scheme: dark)");
+function isDark(){const t=document.documentElement.dataset.theme; return t? t==="dark" : mq.matches;}
+function applySky(){ const d=isDark(); scene.background=new THREE.Color(d?0x1b2433:0xbcd3e8); hemi.intensity=d?.5:.85; sun.intensity=d?.4:.75; }
+try{ mq.addEventListener("change",applySky); new MutationObserver(applySky).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]}); }catch(e){}
+applySky();
+
+const M=c=>new THREE.MeshStandardMaterial({color:c,roughness:.9});
+const mWall=M(0xe6cf86), mCol=M(0x8f9aaa), mWhite=M(0xeceae4), mFloor=M(0xb9bcbd), mDark=M(0x3b2e25), mBeam=M(0x4a3426);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(40,40),mFloor); floor.rotation.x=-Math.PI/2; scene.add(floor);
+// Building: the 2nd-floor floor (where the railing starts) sits at H_CABLE, so the cable and fabric start there.
+const DEPTH=3, BAYS=3, bay=SIDE/BAYS, L1=H_CABLE, C1=L1-.4, C2=3.6, TOP=L1+C2+.4;
+for(let s=0;s<4;s++){
+  const g=new THREE.Group(); g.rotation.y=s*Math.PI/2; scene.add(g);
+  const add=(w,h,d,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m); o.position.set(x,y,z); g.add(o); return o;};
+  add(SIDE+2*DEPTH,TOP,.4,mWall,0,TOP/2,-A-DEPTH-.2);
+  for(let k=0;k<BAYS;k++){ const x=-A+bay*(k+.5); add(1.2,2.6,.05,mDark,x,1.3,-A-DEPTH+.01); add(1.1,2.3,.05,mDark,x,L1+1.15,-A-DEPTH+.01); }
+  for(let k=0;k<=BAYS;k++){ const x=-A+bay*k; add(.42,C1,.42,mCol,x,C1/2,-A-.21); add(.36,C2,.36,mCol,x,L1+C2/2,-A-.21); }
+  for(let k=0;k<BAYS;k++){ const x=-A+bay*(k+.5), r=(bay-.42)/2;
+    [[C1-r-.1,.16,C1],[L1+C2-r-.1,.13,L1+C2]].forEach(([y,t,top])=>{ const h=top-y;
+      const a=new THREE.Mesh(new THREE.TorusGeometry(r,t,8,24,Math.PI),mWhite); a.position.set(x,y,-A-.21); g.add(a);
+      const sp=new THREE.Shape(); sp.moveTo(-bay/2,0); sp.lineTo(-r,0); sp.absarc(0,0,r,Math.PI,0,true); sp.lineTo(bay/2,0); sp.lineTo(bay/2,h); sp.lineTo(-bay/2,h); sp.lineTo(-bay/2,0);
+      const m=new THREE.Mesh(new THREE.ShapeGeometry(sp),mWall); m.position.set(x,y,-A-.02); g.add(m); });
+    // 2nd-floor railing (barandal): starts at the floor, L1
+    add(bay-.4,.05,.05,mBeam,x,L1+.95,-A-.1); for(let q=-6;q<=6;q++) add(.02,.95,.02,mBeam,x+q*(bay-.6)/13,L1+.47,-A-.1);
+  }
+  add(SIDE+2*DEPTH,.4,DEPTH+.4,mWhite,0,L1-.2,-A-DEPTH/2);   // 2nd-floor slab, top = L1
+  add(SIDE+2*DEPTH,.4,DEPTH+.4,mWhite,0,TOP-.2,-A-DEPTH/2);  // roof
+  add(SIDE+.4,.12,.3,mWhite,0,TOP+.65,-A-.15);
+  for(let q=0;q<38;q++){ const b=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,.55,6),mWhite); b.position.set(-A+(q+.5)*SIDE/38,TOP+.3,-A-.15); g.add(b); }
+}
+// fountain: basin fixed, upper tiers scale with the height slider (modeled top = 3.1 m)
+const fountainTop=new THREE.Group(); scene.add(fountainTop);
+(function(){
+  const mW=new THREE.MeshStandardMaterial({color:0xf2f0ea,roughness:.6}), mWat=new THREE.MeshStandardMaterial({color:0x5fd3c5,roughness:.2,metalness:.1});
+  const add=(geo,m,y,top)=>{const o=new THREE.Mesh(geo,m); o.position.y=y; (top?fountainTop:scene).add(o);};
+  add(new THREE.CylinderGeometry(BASIN_R,BASIN_R,.4,48),mW,.2); add(new THREE.CylinderGeometry(BASIN_R-.2,BASIN_R-.2,.05,48),mWat,.38);
+  add(new THREE.CylinderGeometry(.25,.35,1.2,16),mW,.9,1); add(new THREE.CylinderGeometry(.9,.35,.25,32),mW,1.55,1);
+  add(new THREE.CylinderGeometry(.12,.18,1.0,12),mW,2.1,1); add(new THREE.CylinderGeometry(.45,.15,.18,24),mW,2.6,1);
+  add(new THREE.ConeGeometry(.12,.4,12),mW,2.9,1);
+})();
+// cables
+const cableGroup=new THREE.Group(); scene.add(cableGroup);
+(function(){ const m=new THREE.LineBasicMaterial({color:0x222222});
+  const C=[[-A,H_CABLE,-A],[A,H_CABLE,-A],[A,H_CABLE,A],[-A,H_CABLE,A],[-A,H_CABLE,-A]].map(p=>new THREE.Vector3(...p));
+  cableGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(C),m));
+  cableGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([C[0],C[2]]),m));
+  cableGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([C[1],C[3]]),m));
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.3,.05,8,32),new THREE.MeshStandardMaterial({color:0xd8d2c4})); ring.rotation.x=Math.PI/2; ring.position.y=H_CABLE; scene.add(ring);
+})();
+const dispose=g=>{ if(!g) return; scene.remove(g); g.traverse(o=>{ if(o.geometry)o.geometry.dispose(); if(o.material)o.material.dispose(); }); };
+
+// roof fabric
+let fabricGroup=null;
+function buildFabric(){
+  dispose(fabricGroup); fabricGroup=new THREE.Group(); scene.add(fabricGroup);
+  const {strips}=layout(), U=28, V=Math.max(8,Math.round(6*st.full));
+  const folds=Math.max(1,Math.round(st.full*1.5)), amp=.05+.07*(st.full-1);
+  strips.forEach((x,si)=>{ [0,HALF].forEach(off=>{
+    const pos=[], idx=[], seg=x.s1-x.s0;
+    for(let i=0;i<=U;i++){ const u=i/U; for(let j=0;j<=V;j++){ const v=j/V;
+      const pe=perimPoint(x.s0+off+v*seg);
+      const pleat=st.full>1.05?amp*Math.pow(1-u,.8)*Math.sin(v*Math.PI*2*folds):0;
+      pos.push(pe[0]*(1-u), H_CABLE-4*st.sag*u*(1-u)+pleat-(x.m==="B"?.03:0), pe[1]*(1-u)); } }
+    for(let i=0;i<U;i++) for(let j=0;j<V;j++){ const a=i*(V+1)+j,b=a+V+1; idx.push(a,b,a+1,b,b+1,a+1); }
+    const geo=new THREE.BufferGeometry(); geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3)); geo.setIndex(idx); geo.computeVertexNormals();
+    const hi=st.one&&si===0, f=st[x.m];
+    const mat=new THREE.MeshStandardMaterial({color:new THREE.Color(hi?"#d9a73a":f.color),roughness:.75,side:THREE.DoubleSide,transparent:true,
+      opacity:hi?.95:PRESETS[f.preset].op,depthWrite:false,emissive:hi?0x5a3d00:0x2a2620,emissiveIntensity:.35});
+    const mesh=new THREE.Mesh(geo,mat); mesh.renderOrder=hi?2:1; fabricGroup.add(mesh); }); });
+}
+
+// mosquitero + lámpara
+let netGroup=null; const lampLight=new THREE.PointLight(0xffc977,1.1,14,2); scene.add(lampLight);
+function buildNet(){
+  dispose(netGroup); netGroup=new THREE.Group(); scene.add(netGroup);
+  fountainTop.scale.y=st.fh/3.1;
+  const c=centerInfo(), dark=new THREE.LineBasicMaterial({color:0x222222});
+  netGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,H_CABLE,0),new THREE.Vector3(0,c.ring,0)]),dark));
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(NET_R,.025,8,48),new THREE.MeshStandardMaterial({color:0xd8d4ca})); ring.rotation.x=Math.PI/2; ring.position.y=c.ring; netGroup.add(ring);
+  const T=36,S=120,folds=22,tMax=Math.min(1,NET_LEN/c.slant), tulle=()=>new THREE.MeshStandardMaterial({color:0xffffff,roughness:.8,side:THREE.DoubleSide,transparent:true,opacity:.32,depthWrite:false,emissive:0x332a1c,emissiveIntensity:.4});
+  const mk=(P,I)=>{ const g=new THREE.BufferGeometry(); g.setAttribute("position",new THREE.Float32BufferAttribute(P,3)); g.setIndex(I); g.computeVertexNormals(); const m=new THREE.Mesh(g,tulle()); m.renderOrder=3; netGroup.add(m); };
+  const grid=(rows,f)=>{ const P=[],I=[]; for(let i=0;i<=rows;i++) for(let j=0;j<=S;j++) P.push(...f(i/rows,j/S*Math.PI*2,i));
+    for(let i=0;i<rows;i++) for(let j=0;j<S;j++){ const a=i*(S+1)+j,b=a+S+1; I.push(a,b,a+1,b,b+1,a+1); } mk(P,I); };
+  grid(T,(q,th)=>{ const t=tMax*q, r=NET_R+(c.rb-NET_R)*t+.06*t*Math.sin(th*folds); return [r*Math.cos(th), c.ring*(1-t)+.01, r*Math.sin(th)]; });
+  if(c.pool>.05){ const outer=c.rb+c.pool*.6;
+    grid(6,(q,th,i)=>{ const rr=c.rb+(outer-c.rb)*q; return [rr*Math.cos(th), .04+.05*Math.abs(Math.sin(th*folds+i)), rr*Math.sin(th)]; }); }
+  const lampY=c.lampTop-LAMP_R;
+  netGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,c.ring,0),new THREE.Vector3(0,c.lampTop,0)]),dark));
+  const lamp=new THREE.Mesh(new THREE.SphereGeometry(LAMP_R,40,24),new THREE.MeshStandardMaterial({color:0xfff6e4,emissive:0xffcf80,emissiveIntensity:.9,roughness:1}));
+  lamp.position.y=lampY; netGroup.add(lamp);
+  for(let k=-3;k<=3;k++){ const yy=k*LAMP_R/4, rr=Math.sqrt(LAMP_R*LAMP_R-yy*yy)+.004;
+    const rib=new THREE.Mesh(new THREE.TorusGeometry(rr,.004,4,48),new THREE.MeshBasicMaterial({color:0xd9b77a})); rib.rotation.x=Math.PI/2; rib.position.y=lampY+yy; netGroup.add(rib); }
+  lampLight.position.set(0,lampY,0);
+}
+
+// views
+const VIEWS={guest:[[5.5,1.6,6.5],[0,4.6,0]],center:[[4.2,2.0,4.6],[0,2.4,0]],iso:[[18,17,21],[0,3.5,0]],top:[[0,28,.01],[0,0,0]]};
+function setView(k){ const [p,t]=VIEWS[k]; camera.position.set(...p); controls.target.set(...t); controls.update();
+  document.querySelectorAll(".views button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.view===k)); }
+document.querySelectorAll(".views button").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
+function resize(){ const r=canvas.parentElement.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/Math.max(1,r.height); camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(canvas.parentElement);
+
+// inputs
+function update(rebuild=true){ renderPanel(); if(rebuild) buildFabric(); }
+["A","B"].forEach(m=>{
+  const sel=$("preset"+m); sel.innerHTML=Object.entries(PRESETS).map(([k,p])=>"<option value='"+k+"'>"+p.name+"</option>").join(""); sel.value=st[m].preset;
+  const fill=()=>{ $("w"+m).value=st[m].w; $("roll"+m).value=st[m].roll; $("price"+m).value=st[m].price||""; $("col"+m).value=st[m].color; }; fill();
+  sel.addEventListener("change",()=>{ const p=PRESETS[sel.value]; Object.assign(st[m],{preset:sel.value,w:p.w,roll:p.roll,price:p.price}); fill(); update(); });
+  $("w"+m).addEventListener("input",e=>{ const v=parseFloat(e.target.value); if(v>=.3){ st[m].w=v; update(); } });
+  $("roll"+m).addEventListener("input",e=>{ const v=parseFloat(e.target.value); if(v>=5){ st[m].roll=v; update(false); } });
+  $("price"+m).addEventListener("input",e=>{ st[m].price=parseFloat(e.target.value)||0; update(false); });
+  $("col"+m).addEventListener("input",e=>{ st[m].color=e.target.value; update(); });
+});
+$("full").addEventListener("input",e=>{ st.full=parseFloat(e.target.value); update(); });
+$("sag").addEventListener("input",e=>{ st.sag=parseFloat(e.target.value); update(); });
+$("tie").addEventListener("input",e=>{ st.tie=parseFloat(e.target.value); update(false); });
+$("one").addEventListener("change",e=>{ st.one=e.target.checked; buildFabric(); });
+$("cables").addEventListener("change",e=>{ cableGroup.visible=e.target.checked; });
+["drop","gap","fh"].forEach(k=>$(k).addEventListener("input",e=>{ st[k]=parseFloat(e.target.value); renderPanel(); buildNet(); }));
+
+buildNet(); update(); setView("guest"); resize();
+(function loop(){ controls.update(); renderer.render(scene,camera); requestAnimationFrame(loop); })();
+})();
+</script>
+
+</body>
+</html>
