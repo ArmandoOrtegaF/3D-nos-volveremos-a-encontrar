@@ -27,9 +27,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14p
 .app{display:grid;grid-template-columns:minmax(0,1fr) 380px;height:100%}
 .stage{position:relative;min-width:0;min-height:0;overflow:hidden}
 #c{display:block;width:100%;height:100%;touch-action:none}
-.prop{position:absolute;right:16px;bottom:14px;display:flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.prop{position:absolute;right:16px;bottom:14px;display:flex;flex-wrap:wrap;max-width:calc(100% - 32px);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
 .prop span{font:600 11px var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);align-self:center;padding:0 8px 0 10px}
-.prop button{font:600 13px var(--body);border:0;background:transparent;color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer}
+.prop button{font:600 13px var(--body);border:0;background:transparent;color:var(--ink);padding:8px 12px;border-radius:999px;cursor:pointer}
 .prop button[aria-pressed="true"]{background:var(--accent);color:#1C2129}
 .views{position:absolute;left:16px;top:16px;display:flex;gap:6px;flex-wrap:wrap;max-width:calc(100% - 32px)}
 .views button{font:500 12px var(--body);border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 11px;border-radius:999px;cursor:pointer}
@@ -76,6 +76,8 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
 :root[data-theme="dark"] .ok{color:#7BC79A}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ok{color:#7BC79A}}
 #buy{display:flex;flex-direction:column;gap:10px}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.45}
+.steps b{font-weight:600}
 #uses{display:flex;flex-direction:column;gap:8px}
 .use{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;border-bottom:1px solid var(--line);padding-bottom:8px}
 .uname{display:flex;flex-direction:column;gap:2px;font-size:13px;min-width:0}
@@ -83,6 +85,8 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
 .uctl{display:flex;gap:10px;align-items:center;grid-column:1/-1}
 .uctl select{flex:1}
 .ufs{font:500 12px var(--mono);grid-row:1;grid-column:2;align-self:start}
+.tag{font:600 10.5px var(--body);text-transform:uppercase;letter-spacing:.05em;padding:1px 5px;border-radius:4px;background:var(--accent-soft);color:var(--ink)}
+.tFundas{background:var(--line)} .tCarpa{background:color-mix(in srgb,var(--accent) 35%,transparent)}
 .buytot{display:flex;justify-content:space-between;align-items:baseline;font-size:13px}
 .buytot b{font:700 18px var(--mono);font-variant-numeric:tabular-nums}
 .legend{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
@@ -106,15 +110,18 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
     <div class="views" role="group" aria-label="Vistas">
       <button data-view="guest" aria-pressed="true">Vista del invitado</button>
       <button data-view="center" aria-pressed="false">Centro y fuente</button>
-      <button data-view="pulley" aria-pressed="false">Polea</button>
+      <button data-view="pulley" aria-pressed="false">Lámpara</button>
       <button data-view="edge" aria-pressed="false">Cable y pilares</button>
       <button data-view="iso" aria-pressed="false">Maqueta</button>
       <button data-view="top" aria-pressed="false">Planta</button>
     </div>
     <div class="hint">Arrastra para girar · rueda o pellizco para acercar</div>
     <div class="prop" role="group" aria-label="Propuesta">
-      <span>Propuesta</span>
-      <button data-prop="square" aria-pressed="true">Cuadro</button>
+      <span>Cuadro</span>
+      <button data-prop="square" data-ver="v1" aria-pressed="false">V1</button>
+      <button data-prop="square" data-ver="v2" aria-pressed="true">V2 · Final</button>
+      <button data-prop="square" data-ver="v3" aria-pressed="false">V3</button>
+      <button data-prop="square" data-ver="v4" aria-pressed="false">V4</button>
       <button data-prop="circle" aria-pressed="false">Círculo</button>
     </div>
   </div>
@@ -126,13 +133,13 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
     </div>
 
     <div class="total" aria-live="polite">
-      <span class="lbl">Tela necesaria (A + B)</span>
+      <span class="lbl">Tela necesaria (metros que usas)</span>
       <div class="big"><span id="tMeters">—</span><small>m</small></div>
       <div class="split">
         <div><b id="tA">—</b><span id="tAr"></span></div>
         <div><b id="tB">—</b><span id="tBr"></span></div>
-        <div id="tCbox" hidden><b id="tC">—</b><span id="tCr"></span></div>
-        <div><b id="tD">—</b><span id="tDr"></span></div>
+        <div id="tGbox"><b id="tG">—</b><span id="tGr"></span></div>
+
       </div>
     </div>
 
@@ -144,7 +151,7 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
     </div>
 
     <div class="fab" id="fabA">
-      <h2><span class="sw" id="swA"></span>Tela A</h2>
+      <h2><span class="sw" id="swA"></span>Tela 1 · techo, carpa y fundas</h2>
       <select id="presetA" aria-label="Tela A"></select>
       <div class="grid3">
         <div class="field"><label class="lbl" for="wA">Ancho</label><input id="wA" type="number" step="0.05" min="0.3"></div>
@@ -153,8 +160,18 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
         <div class="field"><label class="lbl" for="colA">Color</label><input id="colA" type="color"></div>
       </div>
     </div>
+    <div class="fab" id="fabG">
+      <h2><span class="sw" id="swG"></span>Tela 3 · techo (blanca genérica)</h2>
+      <select id="presetG" aria-label="Tela G"></select>
+      <div class="grid3">
+        <div class="field"><label class="lbl" for="wG">Ancho</label><input id="wG" type="number" step="0.05" min="0.3"></div>
+        <div class="field"><label class="lbl" for="rollG">Rollo</label><input id="rollG" type="number" step="1" min="5"></div>
+        <div class="field"><label class="lbl" for="priceG">$/m</label><input id="priceG" type="number" step="0.01" min="0"></div>
+        <div class="field"><label class="lbl" for="colG">Color</label><input id="colG" type="color"></div>
+      </div>
+    </div>
     <div class="fab" id="fabB">
-      <h2><span class="sw" id="swB"></span>Tela B</h2>
+      <h2><span class="sw" id="swB"></span>Tela 2 · techo</h2>
       <select id="presetB" aria-label="Tela B"></select>
       <div class="grid3">
         <div class="field"><label class="lbl" for="wB">Ancho</label><input id="wB" type="number" step="0.05" min="0.3"></div>
@@ -165,7 +182,7 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
     </div>
 
     <div class="split">
-      <div><b id="sStrips">—</b><span>tiras (A + B)</span></div>
+      <div><b id="sStrips">—</b><span>tiras / piezas del techo</span></div>
       <div><b id="sAvg">—</b><span>largo promedio</span></div>
       <div><b id="sMin">—</b><span>más corta (centro de lado)</span></div>
       <div><b id="sMax">—</b><span>más larga (esquina)</span></div>
@@ -175,7 +192,7 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
       <span class="lbl">Montaje</span>
       <div class="field">
         <div class="row"><label for="full">Fruncido (pliegues)</label><span class="val" id="vFull"></span></div>
-        <input id="full" type="range" min="1" max="3" step="0.1" value="2">
+        <input id="full" type="range" min="1.1" max="3" step="0.1" value="1.1">
       </div>
       <div class="field">
         <div class="row"><label for="sag">Caída al medio</label><span class="val" id="vSag"></span></div>
@@ -185,12 +202,19 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
         <div class="row"><label for="tie">Amarre por extremo</label><span class="val" id="vTie"></span></div>
         <input id="tie" type="range" min="0" max="1.5" step="0.05" value="0.7">
       </div>
+      <p class="note" id="verNote"></p>
+      <label class="check"><input type="checkbox" id="use3" checked> Usar la tela 3 (blanca genérica) en el techo</label>
+      <div class="field" id="waveBox">
+        <label class="lbl" for="waveDir">Dirección de las ondas</label>
+        <select id="waveDir"><option value="straight">Paralelas a los lados</option><option value="diag">Diagonales</option></select>
+      </div>
       <label class="check"><input type="checkbox" id="one"> Resaltar una tira en la maqueta</label>
     </div>
 
     <div class="group">
       <span class="lbl">Cables y cargas</span>
       <label class="check"><input type="checkbox" id="cables" checked> Mostrar cables</label>
+      <label class="check"><input type="checkbox" id="night" checked> Vista de noche con proyectores</label>
       <label class="check"><input type="checkbox" id="hl"> Colorear cables por tipo</label>
       <div class="legend" id="legend" hidden>
         <span><i style="background:#E2562B"></i>Perimetral y X (acero 3/16")</span>
@@ -207,7 +231,7 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
 
     <div class="group">
       <span class="lbl" id="centerTitle">Centro: polea, mosquitero y lámpara</span>
-      <div class="field">
+      <div class="field" hidden>
         <label class="lbl" for="anchor">Amarre de la cuerda de la polea</label>
         <select id="anchor">
           <option value="corner">Pilar de esquina (la cuerda corre junto a la diagonal)</option>
@@ -235,17 +259,17 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
         </div>
         <div class="field">
           <div class="row"><label for="tentFull">Fruncido de la carpa</label><span class="val" id="vTentFull"></span></div>
-          <input id="tentFull" type="range" min="1" max="3" step="0.1" value="2">
+          <input id="tentFull" type="range" min="1.1" max="3" step="0.1" value="1.1">
         </div>
         <div class="field">
           <div class="row"><label for="pool">Tela que descansa en el piso</label><span class="val" id="vPool"></span></div>
           <input id="pool" type="range" min="0" max="1" step="0.05" value="0.3">
         </div>
         <div class="field">
-          <div class="row"><label for="sqDrop">Bajada de la lámpara desde la polea</label><span class="val" id="vSqDrop"></span></div>
-          <input id="sqDrop" type="range" min="0" max="4" step="0.1" value="0.3">
+          <div class="row"><label for="sqDrop">Bajada de la lámpara desde el centro de la X</label><span class="val" id="vSqDrop"></span></div>
+          <input id="sqDrop" type="range" min="0.2" max="3" step="0.1" value="0.7">
         </div>
-        <div class="fab" id="fabC">
+        <div class="fab" id="fabC" hidden>
           <h2><span class="sw" id="swC"></span>Tela C · carpa</h2>
           <select id="presetC" aria-label="Tela C"></select>
           <div class="grid3">
@@ -257,8 +281,8 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
         </div>
       </div>
       <div class="field">
-        <div class="row"><label for="fh">Altura de la fuente (estimada)</label><span class="val" id="vFh"></span></div>
-        <input id="fh" type="range" min="1.5" max="4" step="0.1" value="2.6">
+        <div class="row"><label for="fh">Altura de la fuente</label><span class="val" id="vFh"></span></div>
+        <input id="fh" type="range" min="1.5" max="4" step="0.1" value="2">
       </div>
       <div class="heights" id="heights"></div>
       <p class="warn" id="warn" hidden></p>
@@ -266,8 +290,8 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
     </div>
 
     <div class="group">
-      <span class="lbl">Fundas para cubrir cables</span>
-      <div class="fab" id="fabD">
+      <span class="lbl">Fundas para cubrir cables (organza)</span>
+      <div class="fab" id="fabD" hidden>
         <h2><span class="sw" id="swD"></span>Tela D · fundas</h2>
         <select id="presetD" aria-label="Tela D"></select>
         <div class="grid3">
@@ -277,6 +301,7 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
           <div class="field"><label class="lbl" for="colD">Color</label><input id="colD" type="color"></div>
         </div>
       </div>
+      <label class="check"><input type="checkbox" id="useLeft" checked> Cortar las fundas del sobrante de la organza</label>
       <div class="field">
         <div class="row"><label for="sleeveW">Ancho de la tira para la funda</label><span class="val" id="vSleeveW"></span></div>
         <input id="sleeveW" type="range" min="0.1" max="0.4" step="0.05" value="0.2">
@@ -295,6 +320,11 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
     </div>
 
     <div class="group">
+      <span class="lbl">Cómo se cuelga</span>
+      <ol class="steps" id="steps"></ol>
+    </div>
+
+    <div class="group">
       <span class="lbl">Compra de cable</span>
       <div class="field">
         <div class="row"><label for="ext">Sobrante para amarre en cada punto</label><span class="val" id="vExt"></span></div>
@@ -307,6 +337,16 @@ input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-rad
       <div id="buy"></div>
       <div class="buytot"><span>Total cable y cuerda</span><b id="buyTotal">—</b></div>
       <p class="note">Escribe el precio del rollo completo y cuántos metros trae. Cada tramo se corta de una sola pieza, así que el cálculo acomoda los tramos en rollos sin unir pedazos. Los precios se guardan en este navegador.</p>
+    </div>
+
+    <div class="group">
+      <span class="lbl">Herrajes</span>
+      <div class="split">
+        <div class="field"><label class="lbl" for="clipsMain">Perros por ojo · cables tensados</label><input id="clipsMain" type="number" min="1" max="4" step="1" value="3"></div>
+        <div class="field"><label class="lbl" for="clipsLight">Perros por ojo · amarres y esfera</label><input id="clipsLight" type="number" min="1" max="4" step="1" value="2"></div>
+      </div>
+      <div class="tbl"><table><thead><tr><th>Pieza</th><th>Cantidad</th><th>Para qué</th></tr></thead><tbody id="hw"></tbody></table></div>
+      <p class="note">Para cable de 1.5 mm busca perros de 1/16"; un perro de 1/8" queda flojo en cable delgado y no aprieta bien. Si no los encuentras, usa casquillos de aluminio (férulas) de 1.5 mm con guardacabo, que se prensan con pinza.</p>
     </div>
 
     <div class="group">
@@ -334,6 +374,7 @@ const PRESETS={
   organza:{name:"Organza lisa · 1.50 m",w:1.5,roll:50,price:29.99,op:.62,kgm:2.6/50},
   tul70:{name:"Tul 70 liso · 1.40 m",w:1.4,roll:50,price:19.99,op:.42,kgm:2/50},
   tulnovia:{name:"Tul de novia · 2.80 m",w:2.8,roll:50,price:0,op:.36,kgm:3.8/50},
+  generica:{name:"Tela blanca genérica · 1.40 m",w:1.4,roll:50,price:30,op:.7,kgm:.05},
   otra:{name:"Otra tela · 1.60 m",w:1.6,roll:50,price:0,op:.75,kgm:.06}
 };
 const G=9.81, CENTER_EXTRA=5;  // kg: mosquitero + lámpara + argolla + polea
@@ -341,13 +382,15 @@ const CABLES=[["1/8\"",900],["3/16\"",1900],["1/4\"",3175],["5/16\"",4400]]; // 
 const $=id=>document.getElementById(id);
 const TENT=SIDE/6, ROOF_UP=0;        // el techo va al pie del barandal en ambas propuestas
 const roofH=()=>H_CABLE+(st.prop==="square"?ROOF_UP:0);                   // la carpa va entre los pilares interiores: cuadro de 5.1 m
-const st={full:2,sag:1,tie:.7,one:false,drop:3,gap:1,fh:2.6,xs:.3,anchor:"corner",hl:false,
-  prop:"square",ext:2,tentH:5,tentFull:2,pool:.3,sqDrop:.3,tentSag:.25,sleeveW:.2,sleeveG:2,
+const st={full:1.1,sag:1,tie:.7,one:false,drop:3,gap:1,fh:2,xs:.3,anchor:"corner",hl:false,
+  prop:"square",ver:"v2",clipsMain:3,clipsLight:2,use3:true,waveDir:"straight",ext:2,tentH:5,tentFull:1.1,pool:.3,sqDrop:.7,useLeft:true,tentSag:.25,sleeveW:.2,sleeveG:2,
   D:{preset:"organza",w:1.5,roll:50,price:29.99,color:"#ffffff"},
   C:{preset:"organza",w:1.5,roll:50,price:29.99,color:"#ffffff"},
   A:{preset:"organza",w:1.5,roll:50,price:29.99,color:"#fbf8f1"},
-  B:{preset:"tul70",w:1.4,roll:50,price:19.99,color:"#e7d6ae"}};
+  B:{preset:"tul70",w:1.4,roll:50,price:19.99,color:"#e7d6ae"},
+  G:{preset:"generica",w:1.4,roll:50,price:30,color:"#d6dde3"}};
 
+st.C=st.A; st.D=st.A;                  // la carpa y las fundas usan la misma organza del techo
 function perimPoint(s){ s=((s%PER)+PER)%PER; const side=Math.floor(s/SIDE); const t=s-side*SIDE-A;
   return [[t,-A],[A,t],[-t,A],[-A,-t]][side]; }
 function arcLen(L,d){ if(d<=1e-6) return L; const k=4*d/L; return (L/2)*Math.sqrt(1+k*k)+(L*L/(8*d))*Math.asinh(k); }
@@ -367,41 +410,100 @@ function roofY(px,pz,u,pr){ const P=pr||supports(px,pz);
   return cy(); }
 function halfLen(px,pz){ return supports(px,pz).seg.reduce((a,g)=>a+arcLen(Math.hypot(g.span,g.y1-g.y0),g.d),0); }
 // strips alternate A,B; each takes perimeter space proportional to its width
+const roofOrder=()=>st.use3?["G","A","B"]:["A","B"];   // orden de las tiras: genérica, organza, tul
+const isV1=()=>st.prop!=="square"||st.ver==="v1";
+// qué cables lleva cada versión: lados del perimetral que reciben tela, cómo se cuelga el centro y si hay cruz (+)
+function rig(){ const sq=st.prop==="square", v=st.ver, straight=st.waveDir!=="diag";
+  const two=sq&&(v==="v2"||v==="v3")&&straight;                 // ondas rectas: la tela solo se amarra en los lados oriente y poniente
+  return {sides:two?2:4, sideOn:two?[false,true,false,true]:[true,true,true,true],
+    center: sq&&v==="v2" ? "line" : "X", axis: sq&&v==="v4"}; }
 function layout(){
-  let P=Math.ceil(HALF*st.full/(st.A.w+st.B.w)); if(P%2) P++; P=Math.max(2,P);
-  const unit=HALF/(P*(st.A.w+st.B.w)); const strips=[]; let s=0;
-  for(let p=0;p<P;p++) for(const m of ["A","B"]){ const seg=st[m].w*unit; strips.push({m,s0:s,s1:s+seg}); s+=seg; }
+  const ROOF=roofOrder(), W=ROOF.reduce((a,m)=>a+st[m].w,0);
+  let P=Math.ceil(HALF*st.full/W); if(P%2) P++; P=Math.max(2,P);
+  const unit=HALF/(P*W); const strips=[]; let s=0;
+  for(let p=0;p<P;p++) for(const m of ROOF){ const seg=st[m].w*unit; strips.push({m,s0:s,s1:s+seg}); s+=seg; }
   strips.forEach(x=>{ const [px,pz]=perimPoint((x.s0+x.s1)/2); x.len=2*halfLen(px,pz)+2*st.tie; });
   return {P,strips,realFull:1/unit};
 }
+// ---------- V2–V4: ondas paralelas y remolinos por cuadro ----------
+// sp = apoyos a lo largo de una pieza: {t, y, k} con k = edge (perimetral), tent (cable de la carpa), center (centro de la X), cornerX / axisEdge (centro de un cuadro exterior)
+function profileAt(sp,t){ for(let i=0;i<sp.length-1;i++){ const a=sp[i],b=sp[i+1]; if(t<=b.t+1e-9){ const L=b.t-a.t, f=(t-a.t)/Math.max(1e-9,L), d=st.sag*L/A; return a.y+(b.y-a.y)*f-4*d*f*(1-f); } } return sp[sp.length-1].y; }
+function spansOf(sp){ const o=[]; for(let i=0;i<sp.length-1;i++){ const L=sp[i+1].t-sp[i].t; o.push({L,dy:sp[i+1].y-sp[i].y,d:st.sag*L/A,a:sp[i].k,b:sp[i+1].k}); } return o; }
+const spLen=sp=>spansOf(sp).reduce((a,g)=>a+arcLen(Math.hypot(g.L,g.dy),g.d),0);
+function bandStrips(total){ const ord=roofOrder(), W=ord.reduce((a,m)=>a+st[m].w,0), P=Math.max(1,Math.ceil(total*st.full/W)), unit=total/(P*W), o=[]; let s=0;
+  for(let p=0;p<P;p++) for(const m of ord){ const w=st[m].w*unit; o.push({m,c0:s,c1:s+w}); s+=w; } return o; }
+function wavePieces(skipCenter){
+  const diag=st.waveDir==="diag", T=TENT, R2=Math.SQRT2, total=diag?2*A*R2:2*A, pieces=[];
+  bandStrips(total).forEach(b=>{ const c=(b.c0+b.c1)/2-total/2, hw=(b.c1-b.c0)/2; let o,d,n,t0,t1,cross;
+    if(!diag){ o=[0,c]; d=[1,0]; n=[0,1]; t0=-A; t1=A; cross=[-T,T]; }
+    else { const r=Math.SQRT1_2, m=A*R2-Math.abs(c); if(m<.3) return; n=[r,-r]; d=[r,r]; o=[c*r,-c*r]; t0=-m; t1=m; cross=[-T*R2-c,T*R2-c,-T*R2+c,T*R2+c]; }
+    let cut=null;
+    if(skipCenter){ if(!diag){ if(Math.abs(c)<T) cut=[-T,T]; } else { const lo=Math.max(-T*R2-c,-T*R2+c), hi=Math.min(T*R2-c,T*R2+c); if(lo<hi) cut=[lo,hi]; } }
+    (cut?[[t0,cut[0]],[cut[1],t1]]:[[t0,t1]]).forEach(([a,z])=>{ if(z-a<.3) return;
+      const ts=[a,...cross.filter(t=>t>a+.05&&t<z-.05),z].sort((p,q)=>p-q);
+      const sp=ts.map(t=>{ const edge=Math.abs(t-t0)<1e-6||Math.abs(t-t1)<1e-6; return {t,y:edge?roofH():st.tentH,k:edge?"edge":"tent"}; });
+      pieces.push({kind:"wave",m:b.m,o,d,n,hw,sp,len:spLen(sp)+2*st.tie}); }); });
+  return pieces; }
+function cellPt(h,s){ s=((s%(8*h))+8*h)%(8*h); const side=Math.floor(s/(2*h)), t=s-side*2*h-h; return [[t,-h],[h,t],[-t,h],[-h,-t]][side]; }
+function fanEdge(cx,cz,x,z){ const e=Math.abs(cx+x)>A-1e-6||Math.abs(cz+z)>A-1e-6; return {y:e?roofH():st.tentH,k:e?"edge":"tent"}; }
+function fanPieces(cx,cz,h,yc,kc){ const ord=roofOrder(), W=ord.reduce((a,m)=>a+st[m].w,0), half=4*h, P=Math.max(1,Math.ceil(half*st.full/W)), unit=half/(P*W), o=[]; let s=0;
+  for(let p=0;p<P;p++) for(const m of ord){ const w=st[m].w*unit, s0=s, s1=s+w; s+=w;
+    const sps=[0,half].map(off=>{ const pe=cellPt(h,(s0+s1)/2+off), e=fanEdge(cx,cz,pe[0],pe[1]); return [{t:0,y:e.y,k:e.k},{t:Math.hypot(pe[0],pe[1]),y:yc,k:kc}]; });
+    o.push({kind:"fan",m,cx,cz,h,s0,s1,yc,sps,len:spLen(sps[0])+spLen(sps[1])+2*st.tie}); }
+  return o; }
+function roofPieces(){
+  const T=TENT, v=st.ver;
+  if(v==="v2") return wavePieces(false);
+  if(v==="v3") return [...wavePieces(true),...fanPieces(0,0,T,cy(),"center")];
+  const o=[]; for(const i of [-1,0,1]) for(const j of [-1,0,1]){             // v4: un remolino por cuadro
+    const cx=2*T*i, cz=2*T*j, ctr=!i&&!j, corner=i&&j, dist=Math.hypot(cx,cz), max=corner?A*Math.SQRT2:A;
+    o.push(...fanPieces(cx,cz,T, ctr?cy():cy()+st.xs*dist/max, ctr?"center":corner?"cornerX":"axisEdge")); }
+  return o; }
 function pack(lens,roll){ const rolls=[]; [...lens].sort((a,b)=>b-a).forEach(L=>{
   if(L>roll){ rolls.push({cuts:[L],used:L,over:true}); return; }
   const r=rolls.find(r=>!r.over&&r.used+L<=roll+1e-9); if(r){r.cuts.push(L);r.used+=L;} else rolls.push({cuts:[L],used:L}); }); return rolls; }
 function compute(){
-  const L=layout(); const out={L};
-  ["A","B"].forEach(m=>{ const lens=L.strips.filter(x=>x.m===m).map(x=>x.len); const total=lens.reduce((a,b)=>a+b,0);
-    out[m]={lens,total,rolls:pack(lens,st[m].roll)}; });
+  const v1=isV1(), L=v1?layout():{strips:[]}, out={L}, pcs=v1?[]:roofPieces(); out.pcs=pcs;
+  ["G","A","B"].forEach(m=>{ const lens=!roofOrder().includes(m)?[]: v1? L.strips.filter(x=>x.m===m).map(x=>x.len) : pcs.filter(x=>x.m===m).map(x=>x.len);
+    const total=lens.reduce((a,b)=>a+b,0); out[m]={lens,total,rolls:pack(lens,st[m].roll)}; });
   if(st.prop==="square"){ const t=tentInfo(), lens=Array(t.drops).fill(t.dropLen);
     out.C={lens,total:t.drops*t.dropLen,rolls:pack(lens,st.C.roll)}; }
-  const sl=sleeveInfo(), lensD=[]; let rem=sl.fabric; while(rem>1e-6){ const c=Math.min(rem,st.D.roll); lensD.push(c); rem-=c; }
-  out.D={lens:lensD,total:sl.fabric,rolls:pack(lensD,st.D.roll),sl};
+  out.sl=sleeveInfo(); out.org=organzaPlan(out); out.tul=tagPlan(st.B.roll,[[out.B.lens,"Techo"]]); out.gen=tagPlan(st.G.roll,[[out.G.lens,"Techo"]]);
   return out;
 }
+// acomoda cortes en rollos en orden de prioridad; cada corte es de una sola pieza
+function tagPlan(R,groups,rolls){ rolls=rolls||[];
+  const all=[]; groups.forEach(([lens,tag])=>lens.forEach(L=>all.push([L,tag])));
+  all.sort((a,b)=>b[0]-a[0]).forEach(([L,tag])=>{
+    if(L>R){ rolls.push({cuts:[{L,tag}],used:L,over:true}); return; }
+    const x=rolls.find(r=>!r.over&&r.used+L<=R+1e-9); if(x){ x.cuts.push({L,tag}); x.used+=L; } else rolls.push({cuts:[{L,tag}],used:L}); });
+  return {R,rolls}; }
+function organzaPlan(out){
+  const R=st.A.roll, sq=st.prop==="square";
+  const P=tagPlan(R, sq? [[out.C.lens,"Carpa"],[out.A.lens,"Techo"]] : [[out.A.lens,"Techo"]]);
+  let needF=out.sl.fabric, fromLeft=0;                       // metros de tela para fundas
+  if(st.useLeft) [...P.rolls].filter(r=>!r.over).sort((a,b)=>(b.used<a.used?1:-1)).forEach(r=>{
+    const left=R-r.used; if(needF<=1e-6||left<.3) return; const take=Math.min(left,needF);
+    r.cuts.push({L:take,tag:"Fundas"}); r.used+=take; needF-=take; fromLeft+=take; });
+  while(needF>1e-6){ const c=Math.min(R,needF); P.rolls.push({cuts:[{L:c,tag:"Fundas"}],used:c}); needF-=c; }
+  const sum=t=>P.rolls.reduce((a,r)=>a+r.cuts.filter(c=>c.tag===t).reduce((b,c)=>b+c.L,0),0);
+  P.use={Carpa:sum("Carpa"),Techo:sum("Techo"),Fundas:sum("Fundas")}; P.fromLeft=fromLeft;
+  return P; }
+function planStats(P){ const n=P.rolls.length, used=P.rolls.reduce((a,r)=>a+r.used,0); return {n,used,left:n*P.R-used}; }
 const mats=()=>st.prop==="square"?["A","B","C","D"]:["A","B","D"];
 // fundas fruncidas: tiras cortadas a lo largo del rollo y cosidas en tubo
 function sleeveInfo(){
   const sq=st.prop==="square", items=[];
-  const vert=sq? PULLEY_DROP+.12+st.sqDrop-PULLEY_DROP : st.drop-PULLEY_DROP;   // de la polea a la lámpara / aro
   if(sq) items.push(["4 cables de la carpa, completos",4*SIDE]);
-  items.push(["Cuerda: polea → "+(sq?"lámpara":"aro"),Math.max(0,vert-.3)]);
-  items.push(["Cuerda: polea → pilar",Math.max(0,ropeRun()-.3)]);
+  items.push(["Cable de la lámpara, del centro de la X "+(sq?"a la esfera":"al aro"),hangLen()]);
   items.forEach(x=>x.push(x[1]*st.sleeveG));
   const per=Math.max(1,Math.floor(st.D.w/st.sleeveW)), sleeve=items.reduce((a,x)=>a+x[2],0);
   return {items,per,sleeve,fabric:sleeve/per*1.05};
 }
+function hangLen(){ return st.prop==="square" ? st.sqDrop+.1 : st.drop; }   // cable fijo del centro de la X a la esfera / aro
 function tentInfo(){
   const drops=Math.ceil(8*TENT*st.tentFull/st.C.w), dropLen=st.tentH+st.tie+st.pool;
-  const lampTop=cy()-PULLEY_DROP-.12-st.sqDrop;
+  const lampTop=cy()-.1-st.sqDrop;
   return {drops,dropLen,lampTop,lampBot:lampTop-2*LAMP_R};
 }
 const cy=()=>roofH()-st.xs;          // centro de la X (baja por la flecha del cable)
@@ -411,10 +513,15 @@ function cleatPoint(){ // cara interior del pilar de amarre
 function ropeRun(){ const c=cleatPoint(); return Math.hypot(c[0],c[1]-(cy()-PULLEY_DROP),c[2]); }
 function loads(){
   const r=compute(), lay=r.L;
-  const kg={A:r.A.total*PRESETS[st.A.preset].kgm, B:r.B.total*PRESETS[st.B.preset].kgm}; kg.T=kg.A+kg.B;
+  const kg={A:r.A.total*PRESETS[st.A.preset].kgm, B:r.B.total*PRESETS[st.B.preset].kgm}; kg.G=r.G.total*PRESETS[st.G.preset].kgm; kg.T=kg.A+kg.B+kg.G;
   kg.C=r.C? r.C.total*PRESETS[st.C.preset].kgm : 0;
   // reparte el peso de cada tramo de tela mitad y mitad entre sus dos apoyos (borde, cables de la carpa, centro)
-  let edge=0, onTent=0, mid=0, hSum=0;
+  let edge=0, onTent=0, mid=0, hSum=0, cornerX=0, axisEdge=0;
+  if(!isV1()){ const Rc={edge:0,tent:0,center:0,cornerX:0,axisEdge:0};
+    r.pcs.forEach(p=>{ const kgm=PRESETS[st[p.m].preset].kgm; (p.kind==="wave"?[p.sp]:p.sps).forEach(sp=>spansOf(sp).forEach(g=>{
+      const w=kgm*arcLen(Math.hypot(g.L,g.dy),g.d); Rc[g.a]+=w/2; Rc[g.b]+=w/2;
+      if(g.a==="edge"||g.b==="edge") hSum+=kgm*G*(g.d>.05?g.L*g.L/(8*g.d):g.L*5); })); });
+    edge=Rc.edge; onTent=Rc.tent; mid=Rc.center; cornerX=Rc.cornerX; axisEdge=Rc.axisEdge; }
   lay.strips.forEach(x=>{ const [px,pz]=perimPoint((x.s0+x.s1)/2), kgm=PRESETS[st[x.m].preset].kgm, P=supports(px,pz);
     P.seg.forEach((g,i)=>{ const wkg=2*kgm*arcLen(Math.hypot(g.span,g.y1-g.y0),g.d), last=i===P.seg.length-1;
       if(i===0) edge+=wkg/2; else onTent+=wkg/2;
@@ -423,11 +530,13 @@ function loads(){
   const tieKg=(kg.T)*0;                                         // los amarres de 70 cm ya van en el largo de la tira
   const tentLoad=onTent+kg.C;                                   // kg que cargan los 4 cables de la carpa
   const tTent=st.prop==="square" ? ((onTent/4)*SIDE/8 + (kg.C/4)*(SIDE/4-2*TENT/8))/st.tentSag : 0;   // kgf por cable
-  const center=mid+(st.prop==="square"?3:CENTER_EXTRA), diag=SIDE*Math.SQRT2;
-  const tX=(center/2)*diag/(4*st.xs);                          // kgf por diagonal (carga puntual al centro)
-  const qv=edge*G/PER, qh=hSum/PER, q=Math.hypot(qv,qh);         // N/m sobre el perimetral
+  const center=mid+(st.prop==="square"?2:CENTER_EXTRA), diag=SIDE*Math.SQRT2, RG=rig();
+  const tX=((center/2)*diag/4 + (cornerX/4)*Math.hypot(TENT,TENT))/st.xs;   // kgf por diagonal (centro + cuadros de esquina en V4)
+  const tAxis=(axisEdge/4)*TENT/st.xs;                                         // kgf por cable en cruz (V4)
+  const tLine=center*SIDE/(4*st.xs);                                           // V2: un solo cable por el centro sostiene la esfera
+  const Lper=RG.sides*SIDE, qv=edge*G/Lper, qh=hSum/Lper, q=Math.hypot(qv,qh);   // N/m sobre los lados del perimetral que reciben tela
   const per=L=>q*L*L/(8*.1)/G;                                   // kgf con 10 cm de flecha
-  return {kg,center,tX,tPerFree:per(SIDE),tPerTied:per(SIDE/3),q,tTent,onTent,tentLoad};
+  return {kg,center,tX,tAxis,tLine,tPerFree:per(SIDE),tPerTied:per(SIDE/3),q,tTent,onTent,tentLoad};
 }
 const pick=t=>(CABLES.find(c=>c[1]/5>=t)||CABLES[CABLES.length-1]);
 function centerInfo(){
@@ -452,21 +561,31 @@ function cableRows(){
 const PRODUCTS=[
   {id:"x18",name:"Cable rígido 1/8\" acero galvanizado 7x7 · 75 m (Fiero 44205)",short:"Cable 1/8\" 7x7",roll:75,price:0,mbs:770},
   {id:"thin",name:"Cable de acero inoxidable 304 · 7x7 · 1.5 mm · 50 m",short:"Cable 7x7 1.5 mm",roll:50,price:178,mbs:170},
-  {id:"rope",name:"Cuerda de poliéster doble trenza 3/8\" · 200 ft (61 m) · 4,800 lb",short:"Cuerda 3/8\"",roll:61,price:303,mbs:2177}];
-const USEDEF={per:{prod:"thin",dbl:false},x:{prod:"x18",dbl:false},ties:{prod:"thin",dbl:false},tent:{prod:"thin",dbl:false},lamp:{prod:"thin",dbl:false},rope:{prod:"rope",dbl:false}};
-try{ const sv=JSON.parse(localStorage.getItem("techo-cable2")||"{}");
+];
+const USEDEF={per:{prod:"auto",dbl:false},x:{prod:"auto",dbl:false},ties:{prod:"auto",dbl:false},tent:{prod:"auto",dbl:false},lamp:{prod:"auto",dbl:false},axis:{prod:"auto",dbl:false},cline:{prod:"auto",dbl:false}};
+try{ const sv=JSON.parse(localStorage.getItem("techo-cable5")||"{}");
   (sv.p||[]).forEach(o=>{ const P=PRODUCTS.find(x=>x.id===o.id); if(P) Object.assign(P,{price:o.price,roll:o.roll,mbs:o.mbs}); });
   Object.entries(sv.u||{}).forEach(([k,v])=>{ if(USEDEF[k]) Object.assign(USEDEF[k],v); }); }catch(e){}
-function saveBuy(){ try{ localStorage.setItem("techo-cable2",JSON.stringify({p:PRODUCTS.map(x=>({id:x.id,price:x.price,roll:x.roll,mbs:x.mbs})),u:USEDEF})); }catch(e){} }
+function saveBuy(){ try{ localStorage.setItem("techo-cable5",JSON.stringify({p:PRODUCTS.map(x=>({id:x.id,price:x.price,roll:x.roll,mbs:x.mbs})),u:USEDEF})); }catch(e){} }
 function cableUses(L){
   const half=Math.hypot(A*Math.SQRT2,st.xs), run=ropeRun(), down=cy()-PULLEY_DROP-.5, sq=st.prop==="square", e2=2*st.ext;
-  const u=[{id:"per",name:"Perimetral, 4 tramos (uno por lado)",span:SIDE,piece:SIDE+e2,n:4,load:L.tPerTied},
-    {id:"x",name:"X, 4 medias diagonales a la argolla",span:half,piece:half+e2,n:4,load:L.tX},
-    {id:"ties",name:"Amarres del perimetral a 8 pilares",span:.6,piece:.6+e2,n:8,load:L.tPerTied}];
+  const RG=rig();
+  const u=[{id:"per",name:RG.sides===4?"Perimetral, 4 tramos (uno por lado)":"Perimetral, 2 tramos (lados oriente y poniente)",span:SIDE,piece:SIDE+e2,n:RG.sides,load:L.tPerTied},
+    RG.center==="X"? {id:"x",name:"X, 4 medias diagonales a la argolla",span:half,piece:half+e2,n:4,load:L.tX}
+                   : {id:"cline",name:"1 cable de lado a lado por el centro (sostiene la esfera)",span:SIDE,piece:SIDE+e2,n:1,load:L.tLine},
+    {id:"ties",name:"Amarres del perimetral a "+(2*RG.sides)+" pilares intermedios",span:.6,piece:.6+e2,n:2*RG.sides,load:L.tPerTied}];
   if(sq) u.push({id:"tent",name:"4 cables de la carpa, pilar a pilar",span:SIDE,piece:SIDE+e2,n:4,load:L.tTent});
-  else u.push({id:"lamp",name:"Cuelgue de la lámpara",span:st.gap,piece:st.gap+e2,n:1,load:5});
-  u.push({id:"rope",name:"Cuerda de la polea",span:run+(sq?st.sqDrop:st.drop),piece:run+down+e2,n:1,load:5,fixed:true});
-  u.forEach(x=>{ Object.assign(x,USEDEF[x.id]); x.count=x.n*(x.dbl?2:1); const P=PRODUCTS.find(p=>p.id===x.prod);
+  if(RG.axis) u.push({id:"axis",name:"2 cables en cruz (+) para los centros de los cuadros",span:SIDE,piece:SIDE+e2,n:2,load:L.tAxis});
+  const hl=hangLen()+(sq?0:st.gap);
+  u.push({id:"lamp",name:"Cable fijo de la esfera (del centro)",span:hl,piece:hl+e2,n:1,load:5});
+  // automático: el cable más barato que aguanta esa parte con factor de seguridad 5 (7x7 1.5 mm → 1/8" → 1/8" doble)
+  const pickAuto=load=>{ const t=PRODUCTS.find(p=>p.id==="thin"), x=PRODUCTS.find(p=>p.id==="x18");
+    return t.mbs/load>=5?["thin",false]: t.mbs*1.8/load>=5&&false?["thin",true]: x.mbs/load>=5?["x18",false]:["x18",true]; };
+  u.forEach(x=>{ Object.assign(x,USEDEF[x.id]); x.auto=x.prod==="auto"; if(x.auto){ const r=pickAuto(Math.max(1,x.load)); x.prod=r[0]; x.dbl=r[1]; }
+    x.count=x.n*(x.dbl?2:1); });
+  // el cable de la esfera sale del sobrante: si ya se compra 1/8" para otra parte, va en ese rollo
+  const lamp=u.find(x=>x.id==="lamp"); if(lamp&&lamp.auto){ lamp.prod=u.some(x=>x.id!=="lamp"&&x.prod==="x18")?"x18":"thin"; lamp.dbl=false; lamp.count=1; }
+  u.forEach(x=>{ const P=PRODUCTS.find(p=>p.id===x.prod);
     x.fs=P.mbs*(x.dbl?1.8:1)/Math.max(1,x.load); });
   return u;
 }
@@ -483,59 +602,81 @@ const money=n=>"$"+n.toLocaleString("es-MX",{minimumFractionDigits:0,maximumFrac
 const nm=m=>PRESETS[st[m].preset].name.split(" · ")[0];
 
 function renderPanel(){
-  const r=compute(), all=[...r.A.lens,...r.B.lens];
+  const r=compute(), all=[...r.G.lens,...r.A.lens,...r.B.lens];
   $("vFull").textContent=fmt(st.full)+"×"; $("vSag").textContent=fmt(st.sag)+" m"; $("vTie").textContent=fmt(st.tie,2)+" m";
   const sq=st.prop==="square";
-  $("subTxt").textContent="Patio de 15.3 × 15.3 m. Cable perimetral y cruz de cables a "+fmt(roofH())+" m, al nivel del piso del segundo piso, donde empieza el barandal."+(sq?" Los 4 cables de la carpa van a la misma altura, de pilar a pilar, y el techo se apoya sobre ellos.":"")+" Dos telas intercaladas en el mismo cable: cada tira cruza de una orilla a la opuesta pasando por el centro, y alternan A, B, A, B para formar las franjas hacia el centro.";
-  $("tMeters").textContent=fmt(Math.ceil(mats().reduce((a,m)=>a+r[m].total,0)),0);
-  $("tCbox").hidden=!sq; $("grpSquare").hidden=!sq; $("grpCircle").hidden=sq;
-  document.querySelector(".total .lbl").textContent=sq?"Tela necesaria (A + B + carpa C + fundas D)":"Tela necesaria (A + B + fundas D)";
-  document.querySelectorAll(".prop button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.prop===st.prop));
-  mats().forEach(m=>{ $("t"+m).textContent=m+": "+fmt(Math.ceil(r[m].total),0)+" m";
-    $("t"+m+"r").textContent=nm(m)+" · "+r[m].lens.length+(m==="C"?" caídas de "+fmt(r.C.lens[0])+" m":m==="D"?" corte"+(r.D.lens.length>1?"s":"")+" para fundas":" tiras")+" · "+r[m].rolls.length+(r[m].rolls.length===1?" rollo de ":" rollos de ")+st[m].roll+" m";
-    $("sw"+m).style.background=st[m].color; });
-  $("sStrips").textContent=r.A.lens.length+" + "+r.B.lens.length;
+  const os=planStats(r.org), ts=planStats(r.tul), gs=planStats(r.gen);
+  $("tMeters").textContent=fmt(Math.ceil(os.used+ts.used+gs.used),0);
+  $("grpSquare").hidden=!sq; $("grpCircle").hidden=sq;
+  document.querySelectorAll(".prop button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.prop===st.prop&&(st.prop!=="square"||b.dataset.ver===st.ver)));
+  $("fabG").hidden=!st.use3; $("tGbox").hidden=!st.use3; $("waveBox").hidden=!(sq&&(st.ver==="v2"||st.ver==="v3"));
+  $("verNote").textContent=!sq?"Círculo: techo en remolino y mosquitero al centro.":{
+    v1:"V1 · Remolino: cada tira cruza de orilla a orilla pasando por el centro y se apoya en los cables de la carpa.",
+    v2:"V2 · VERSIÓN FINAL · Ondas paralelas: las tiras van de orilla a orilla, una junto a otra, y descansan en los cables de la carpa formando ondas. Cubre todo sin huecos.",
+    v3:"V3 · Remolino al centro + ondas: solo el cuadro de la carpa (encima de la esfera) lleva remolino; los 8 cuadros de alrededor llevan ondas.",
+    v4:"V4 · Un remolino por cuadro: cada uno de los 9 cuadros tiene su propio remolino. Necesita 2 cables extra en cruz (+) para colgar el centro de los cuadros laterales."}[st.ver];
+  $("subTxt").textContent="Patio de 15.3 × 15.3 m. Cable perimetral y cruz de cables a "+fmt(roofH())+" m, al nivel del piso del segundo piso, donde empieza el barandal."+(sq?" Los 4 cables de la carpa van a la misma altura, de pilar a pilar, y el techo se apoya sobre ellos.":"")+(st.use3?" Techo con tres telas intercaladas (genérica, organza, tul). ":" Techo con dos telas intercaladas (organza, tul). ")+$("verNote").textContent;
+  const rl=n=>n+(n===1?" rollo":" rollos");
+  $("tA").textContent=nm("A")+": "+rl(os.n); $("tB").textContent=nm("B")+": "+rl(ts.n);
+  $("tAr").textContent=(sq?"Carpa "+fmt(r.org.use.Carpa,0)+" m · ":"")+"Techo "+fmt(r.org.use.Techo,0)+" m · Fundas "+fmt(r.org.use.Fundas,0)+" m · sobran "+fmt(os.left,0)+" m";
+  $("tBr").textContent="Techo "+fmt(ts.used,0)+" m · sobran "+fmt(ts.left,0)+" m";
+  $("tG").textContent=nm("G")+": "+rl(gs.n); $("tGr").textContent="Techo "+fmt(gs.used,0)+" m · sobran "+fmt(gs.left,0)+" m"; $("swG").style.background=st.G.color;
+  $("swA").style.background=st.A.color; $("swB").style.background=st.B.color;
+  $("sStrips").textContent=(st.use3?r.G.lens.length+" + ":"")+r.A.lens.length+" + "+r.B.lens.length;
   $("sAvg").textContent=fmt(all.reduce((a,b)=>a+b,0)/all.length)+" m";
   $("sMin").textContent=fmt(Math.min(...all))+" m"; $("sMax").textContent=fmt(Math.max(...all))+" m";
   let tm=0,tr=0,missing=false;
-  $("budget").innerHTML=mats().map(m=>{ const p=st[m].price; if(!p) missing=true;
-    const a=r[m].total*p, b=r[m].rolls.length*st[m].roll*p; tm+=a; tr+=b;
-    return "<tr><td>"+m+" · "+nm(m)+"</td><td>"+(p?money(a):"falta precio")+"</td><td>"+(p?money(b):"—")+"</td></tr>"; }).join("")+
+  $("budget").innerHTML=[["G",gs],["A",os],["B",ts]].filter(([m])=>m!=="G"||st.use3).map(([m,S])=>{ const p=st[m].price; if(!p) missing=true;
+    const a=S.used*p, b=S.n*st[m].roll*p; tm+=a; tr+=b;
+    return "<tr><td>"+nm(m)+"<br><span class='mut'>usas "+fmt(S.used,0)+" m · "+rl(S.n)+" · sobran "+fmt(S.left,0)+" m</span></td><td>"+(p?money(a):"falta precio")+"</td><td>"+(p?money(b):"—")+"</td></tr>"; }).join("")+
     "<tr class='tot'><td>Total"+(missing?" (incompleto)":"")+"</td><td>"+money(tm)+"</td><td>"+money(tr)+"</td></tr>";
   const c=centerInfo(), ti=tentInfo(), w=[];
   $("vDrop").textContent=fmt(st.drop)+" m"; $("vGap").textContent=fmt(st.gap)+" m"; $("vFh").textContent=fmt(st.fh)+" m";
   $("vTentH").textContent=fmt(st.tentH)+" m"; $("vTentSag").textContent=fmt(st.tentSag,2)+" m"; $("vTentFull").textContent=fmt(st.tentFull)+"×"; $("vPool").textContent=fmt(st.pool,2)+" m"; $("vSqDrop").textContent=fmt(st.sqDrop)+" m";
-  $("centerTitle").textContent=sq?"Centro: carpa cuadrada y lámpara":"Centro: polea, mosquitero y lámpara";
+  $("centerTitle").textContent=sq?"Centro: carpa cuadrada y lámpara":"Centro: mosquitero y lámpara";
   if(sq){
     $("heights").innerHTML="<span>Cables de la carpa (el techo se apoya en ellos)</span><b>"+fmt(st.tentH)+" m</b><span>Lámpara (arriba → abajo)</span><b>"+fmt(ti.lampTop)+" → "+fmt(ti.lampBot)+" m</b><span>Punta de la fuente</span><b>"+fmt(st.fh)+" m</b><span>Carpa</span><b>"+fmt(2*TENT)+" × "+fmt(2*TENT)+" m</b>";
     if(ti.lampBot<st.fh) w.push("La lámpara queda a la altura de la fuente.");
-    $("centerNote").textContent="4 cables de pilar interior a pilar interior, al pie del barandal del segundo piso, forman un cuadro de "+fmt(2*TENT)+" m alrededor de la fuente (la pila mide 4 m); la tela C cuelga de los 4 tramos centrales hasta el piso y el techo de tela descansa sobre los cables. Amarra los cables entre sí en las 4 esquinas del cuadro. La lámpara cuelga directo de la cuerda de la polea.";
+    $("centerNote").textContent="4 cables de pilar interior a pilar interior, al pie del barandal del segundo piso, forman un cuadro de "+fmt(2*TENT)+" m alrededor de la fuente (la pila mide 4 m); la tela C cuelga de los 4 tramos centrales hasta el piso y el techo de tela descansa sobre los cables. Amarra los cables entre sí en las 4 esquinas del cuadro. La esfera de papel cuelga fija del centro de la X con un tramo del sobrante del cable 7x7.";
   } else {
     const reach=c.pool>=0?"llega al piso, sobran "+fmt(c.pool)+" m":"queda a "+fmt(-c.pool*c.ring/c.slant)+" m del piso";
     $("heights").innerHTML="<span>Aro del mosquitero</span><b>"+fmt(c.ring)+" m</b><span>Lámpara (arriba → abajo)</span><b>"+fmt(c.lampTop)+" → "+fmt(c.lampBot)+" m</b><span>Punta de la fuente</span><b>"+fmt(st.fh)+" m</b><span>Tela del mosquitero</span><b>"+reach+"</b>";
     if(c.ring<st.fh) w.push("El aro queda "+fmt(st.fh-c.ring)+" m por debajo de la punta de la fuente: la fuente atravesaría el mosquitero.");
     if(c.lampBot<st.fh) w.push("La lámpara queda a la altura de la fuente y del agua.");
     if(c.lampBot<0) w.push("La lámpara toca el piso.");
-    $("centerNote").textContent="El aro del mosquitero cuelga de una cuerda que pasa por una polea en el centro de la X y se amarra a una cornamusa en un pilar del segundo piso. Soltando la cuerda bajas todo al piso para montarlo. Mosquitero: aro de 1 m y 5 m de tela. Lámpara de papel de 1 m colgada dentro.";
+    $("centerNote").textContent="El aro del mosquitero cuelga fijo del centro de la X con un cable 7x7. Mosquitero: aro de 1 m y 5 m de tela. Lámpara de papel de 1 m colgada dentro.";
   }
   $("warn").hidden=!w.length; $("warn").textContent=w.join(" ");
   $("vExt").textContent=fmt(st.ext,1)+" m";
   $("cableNote").textContent="«Largo» es la distancia de punto a punto. «A comprar» suma "+fmt(st.ext,1)+" m en cada punto de amarre (2 por tramo) para rodear el pilar, hacer el ojo y ajustar. El perimetral va en 4 tramos, uno por lado, y la X en 4 medias diagonales unidas a una argolla central. La cuerda alcanza para bajar la lámpara hasta 0.5 m del piso.";
   const L=loads(), kgf=n=>fmt(n,0)+" kgf", xc=pick(L.tX), pc=pick(L.tPerTied);
-  const sl=r.D.sl;
+  const sl=r.sl;
   $("vSleeveW").textContent=fmt(st.sleeveW*100,0)+" cm"; $("vSleeveG").textContent=fmt(st.sleeveG)+"×";
   $("sleeves").innerHTML=sl.items.map(x=>"<tr><td>"+x[0]+"</td><td>"+fmt(x[1])+" m</td><td>"+fmt(x[2])+" m</td></tr>").join("")+
-    "<tr class='tot'><td>Tela D para fundas</td><td></td><td>"+fmt(sl.fabric)+" m</td></tr>";
-  $("sleeveNote").textContent="De un ancho de "+fmt(st.D.w,2)+" m salen "+sl.per+" tiras de "+fmt(st.sleeveW*100,0)+" cm; se cortan a lo largo y se cosen en tubo, uniendo tiras donde haga falta (incluye 5% para costuras). Las fundas de la cuerda terminan 30 cm antes de la polea para que la cuerda siga corriendo: cúbrela ya con la lámpara a su altura final.";
+    "<tr class='tot'><td>Organza para fundas</td><td></td><td>"+fmt(sl.fabric)+" m</td></tr>";
+  const fromLeft=r.org.fromLeft, extra=sl.fabric-fromLeft;
+  $("sleeveNote").textContent="De un ancho de "+fmt(st.A.w,2)+" m salen "+sl.per+" tiras de "+fmt(st.sleeveW*100,0)+" cm; se cortan a lo largo y se cosen en tubo, uniendo tiras donde haga falta (incluye 5% para costuras). "+
+    (st.useLeft? (extra<.05? "Todo sale del sobrante de los rollos de organza (después de cortar la carpa y el techo)." : fmt(fromLeft)+" m salen del sobrante y "+fmt(extra)+" m de tela nueva.") : "Las fundas se cortan de tela nueva, sin usar el sobrante.");
   const CP=cablePlan(L); let bt=0, missingC=false;
+  { const MAIN=["per","x","cline","tent","axis"], g=id=>CP.uses.find(x=>x.id===id), cnt=id=>(g(id)||{count:0}).count;
+    let eMain=0, eLight=0; CP.uses.forEach(x=>{ const e=2*x.count; if(MAIN.includes(x.id)) eMain+=e; else eLight+=e; });
+    const cross=st.prop==="square"?4:0, perros0=eMain*st.clipsMain+eLight*st.clipsLight+cross*1, perros=Math.ceil(perros0*1.1);
+    const tens=cnt("per")+cnt("tent")+cnt("x")+cnt("cline")+cnt("axis");
+    const prot=2*cnt("per")+cnt("ties")+2*cnt("tent")+cnt("x");
+    $("hw").innerHTML=[
+      ["Perros (grapas)",perros,eMain+" ojos de cables tensados × "+st.clipsMain+" + "+eLight+" ojos de amarres y esfera × "+st.clipsLight+(cross?" + "+cross+" cruces de la carpa":"")+" + 10% de repuesto"],
+      ["Guardacabos",eMain+eLight,"uno en cada ojo, para que el cable no se doble en seco"],
+      ["Tensores",tens,"uno por cada cable tensado, para ajustar la flecha"],
+      ["Protectores para pilar",prot,"en cada punto donde un cable rodea un pilar"]
+    ].map(x=>"<tr><td>"+x[0]+"</td><td><b>"+x[1]+"</b></td><td class='mut'>"+x[2]+"</td></tr>").join(""); }
   $("cableTbl").innerHTML=CP.uses.map(x=>{ const P=PRODUCTS.find(p=>p.id===x.prod);
     return "<tr><td>"+x.name+(x.dbl?" · doble":"")+"<br><span class='mut'>"+P.short+"</span></td><td>"+fmt(x.n*x.span)+" m</td><td>"+x.count+" × "+fmt(x.piece)+" = "+fmt(x.count*x.piece)+" m</td></tr>"; }).join("");
   $("uses").innerHTML=CP.uses.map(x=>{
-    const sel=x.fixed?"<span class='mut'>"+PRODUCTS.find(p=>p.id===x.prod).short+"</span>":"<select data-use='"+x.id+"' data-k='prod' aria-label='Cable para "+x.name+"'>"+PRODUCTS.filter(p=>p.id!=="rope").map(p=>"<option value='"+p.id+"'"+(p.id===x.prod?" selected":"")+">"+p.short+"</option>").join("")+"</select>";
-    const dbl=x.fixed?"":"<label class='check'><input type='checkbox' data-use='"+x.id+"' data-k='dbl'"+(x.dbl?" checked":"")+"> Doble</label>";
+    const sel=x.fixed?"<span class='mut'>"+PRODUCTS.find(p=>p.id===x.prod).short+"</span>":"<select data-use='"+x.id+"' data-k='prod' aria-label='Cable para "+x.name+"'>"+"<option value='auto'"+(x.auto?" selected":"")+">Automático → "+PRODUCTS.find(p=>p.id===x.prod).short+(x.dbl?" doble":"")+"</option>"+PRODUCTS.filter(p=>p.id!=="rope").map(p=>"<option value='"+p.id+"'"+(!x.auto&&p.id===x.prod?" selected":"")+">"+p.short+"</option>").join("")+"</select>";
+    const dbl=x.fixed?"":"<label class='check'><input type='checkbox' data-use='"+x.id+"' data-k='dbl'"+(x.dbl?" checked":"")+(x.auto?" disabled":"")+"> Doble</label>";
     const ok=x.fs>=5;
     return "<div class='use'><div class='uname'>"+x.name+"<span class='mut'>jala ~"+fmt(x.load,0)+" kgf</span></div><div class='uctl'>"+sel+dbl+"</div><div class='ufs "+(ok?"ok":"bad")+"'>Seguridad "+fmt(x.fs,1)+(ok?" ✓":" ✗")+"</div></div>"; }).join("");
-  $("buy").innerHTML=CP.plan.map(c=>{ const P=c.P; if(!P.price) missingC=true; bt+=c.cost;
+  $("buy").innerHTML=CP.plan.filter(c=>c.pieces.length).map(c=>{ const P=c.P; if(!P.price) missingC=true; bt+=c.cost;
     return "<div class='buy'><h3>"+P.name+"</h3>"+
       "<div class='grid2'><div class='field'><label class='lbl' for='bp_"+P.id+"'>Precio del rollo</label><input id='bp_"+P.id+"' data-prod='"+P.id+"' data-k='price' type='number' min='0' step='1' value='"+(P.price||"")+"' placeholder='$'></div>"+
       "<div class='field'><label class='lbl' for='br_"+P.id+"'>Metros por rollo</label><input id='br_"+P.id+"' data-prod='"+P.id+"' data-k='roll' type='number' min='1' step='1' value='"+P.roll+"'></div>"+
@@ -550,20 +691,37 @@ function renderPanel(){
   $("cMeters").textContent=fmt(cm,0);
   const miss=CP.plan.filter(c=>c.pieces.length&&!c.P.price).map(c=>c.P.short);
   $("cCost").textContent="Costo: "+money(bt)+(miss.length?" (falta el precio de: "+miss.join(", ")+")":"");
+  { const RG=rig(), v=st.ver, sq=st.prop==="square", diag=st.waveDir==="diag", fl=fmt(st.tentSag*100,0);
+    const roof={v1:"<b>Techo (remolino):</b> cada tira se amarra en una orilla, pasa por encima de los cables de la carpa, se junta en la argolla del centro y sigue hasta la orilla opuesta. En el centro se juntan todas con una cincha de tela.",
+      v2:"<b>Techo (ondas"+(diag?" diagonales":"")+"):</b> cada tira se amarra en "+(diag?"una orilla":"el lado poniente")+", se apoya sobre los cables de la carpa que cruza y se amarra en "+(diag?"la orilla de enfrente":"el lado oriente")+". Un cincho donde la tira descansa sobre cada cable evita que se deslice.",
+      v3:"<b>Techo:</b> primero el remolino del cuadro del centro, con tiras que van de los cables de la carpa a la argolla. Luego las ondas de los 8 cuadros de alrededor; las que cruzan el centro se cortan en 2 piezas que terminan amarradas en los cables de la carpa.",
+      v4:"<b>Techo (9 remolinos):</b> en cada cuadro las tiras van de su borde (perimetral o cable de la carpa) al punto central del cuadro, que cuelga de la X (esquinas) o de la cruz (+) (lados). En cada punto central se juntan con una argolla pequeña."}[sq?v:"v1"];
+    $("steps").innerHTML=[
+      "<b>Perimetral:</b> "+RG.sides+" tramo"+(RG.sides>1?"s":"")+" al pie del barandal"+(RG.sides===2?" (solo oriente y poniente; los otros dos lados no reciben tela)":"")+", rodeando los pilares de esquina con eslinga o protector y tensado con tensor. Cada tramo se amarra también a sus 2 pilares intermedios.",
+      ...(sq?["<b>Carpa:</b> antes de amarrar los 4 cables de la carpa, pasa por cada uno las fundas de organza y las caídas de la carpa (con jareta o pinzas). Después se amarran de pilar a pilar a 5 m, con unos "+fl+" cm de flecha."]:[]),
+      RG.center==="X"? "<b>Centro:</b> la X va de las 4 esquinas a una argolla central, con "+fmt(st.xs*100,0)+" cm de flecha."+(RG.axis?" En V4 se agregan 2 cables en cruz (+) amarrados a la misma argolla.":"")
+                     : "<b>Centro:</b> en V2 no hace falta la X; basta 1 cable de lado a lado por el centro para colgar la esfera.",
+      "<b>Esfera:</b> cuelga fija de la argolla con un tramo corto de cable y su funda.",
+      roof,
+      "<b>Amarres de tela:</b> deja "+fmt(st.tie*100,0)+" cm en cada extremo, frunce la tela sobre el cable y sujétala con cinchos o pinzas cada 30 cm. No hace falta perforar la tela.",
+      "<b>Orden de montaje:</b> perimetral → fundas y carpa en sus cables → centro y esfera → techo, del centro hacia las orillas."
+    ].map(x=>"<li>"+x+"</li>").join(""); }
   $("vXs").textContent=fmt(st.xs,2)+" m";
   $("loads").innerHTML=[
-    ["Peso tela A ("+nm("A")+")",fmt(L.kg.A)+" kg"],["Peso tela B ("+nm("B")+")",fmt(L.kg.B)+" kg"],
-    ["Peso del techo de tela (A + B)",fmt(L.kg.T)+" kg"],
+    ["Peso tela genérica ("+nm("G")+")",fmt(L.kg.G)+" kg"],["Peso tela A ("+nm("A")+")",fmt(L.kg.A)+" kg"],["Peso tela B ("+nm("B")+")",fmt(L.kg.B)+" kg"],
+    ["Peso del techo de tela (3 telas)",fmt(L.kg.T)+" kg"],
     ...(sq?[["Peso de la carpa (C)",fmt(L.kg.C)+" kg"]]:[]),
-    [sq?"Carga que llega al centro (techo interior + 3 kg de lámpara y polea)":"Carga que llega al centro (mitad del techo + "+CENTER_EXTRA+" kg de mosquitero, lámpara y polea)",fmt(L.center)+" kg"],
-    ["Tensión en cada diagonal de la X",kgf(L.tX)],
+    [sq?"Carga que llega al centro (techo interior + 2 kg de esfera y argolla)":"Carga que llega al centro (mitad del techo + "+CENTER_EXTRA+" kg de mosquitero, lámpara y polea)",fmt(L.center)+" kg"],
+    rig().center==="X"?["Tensión en cada diagonal de la X",kgf(L.tX)]:["Tensión en el cable del centro",kgf(L.tLine)],
+    ...(rig().axis?[["Tensión en cada cable de la cruz (+)",kgf(L.tAxis)]]:[]),
+    ["Lados del perimetral que reciben tela",rig().sides+" de 4"],
     ["Tensión perimetral sin amarres intermedios (tramo de 15.3 m)",kgf(L.tPerFree)],
     ["Tensión perimetral con amarres a pilares (tramo de 5.1 m)",kgf(L.tPerTied)],
     ...(sq?[["Techo que descansa sobre los cables de la carpa",fmt(L.onTent)+" kg"],["Tensión en cada cable de la carpa ("+fmt(st.tentSag*100,0)+" cm de flecha)",kgf(L.tTent)]]:[])
   ].map(x=>"<tr><td>"+x[0]+"</td><td>"+x[1]+"</td></tr>").join("");
-  $("reco").textContent="Con factor de seguridad 5: para la X basta cable de acero galvanizado 7x19 de "+xc[0]+" (rompe a unos "+fmt(xc[1],0)+" kgf, trabaja hasta ~"+fmt(xc[1]/5,0)+"). "+
-    "Para el perimetral con amarres basta "+pc[0]+", pero usar 3/16\" en todo simplifica herrajes. Menos flecha en la X sube mucho la tensión. No incluye viento ni lluvia.";
-  $("cuts").innerHTML=mats().map(m=>r[m].rolls.map((x,i)=>"<tr><td>"+m+(i+1)+"</td><td>"+x.cuts.map(c=>fmt(c)).join(" · ")+(x.over?" (más largo que el rollo)":"")+"</td><td>"+(x.over?"—":fmt(st[m].roll-x.used))+"</td></tr>").join("")).join("");
+  $("reco").textContent="El factor de seguridad de cada parte está en «Compra de cable». Menos flecha en la X o en los cables de la carpa sube mucho la tensión. No incluye viento.";
+  $("cuts").innerHTML=[["G",r.gen],["A",r.org],["B",r.tul]].filter(([m])=>m!=="G"||st.use3).map(([m,P])=>P.rolls.map((x,i)=>"<tr><td>"+nm(m)+" "+(i+1)+"</td><td>"+
+      x.cuts.map(c=>"<span class='tag t"+c.tag+"'>"+c.tag+"</span> "+fmt(c.L)).join(" · ")+(x.over?" (más largo que el rollo)":"")+"</td><td>"+(x.over?"—":fmt(P.R-x.used))+"</td></tr>").join("")).join("");
 }
 
 // ---------- scene ----------
@@ -575,12 +733,14 @@ const hemi=new THREE.HemisphereLight(0xffffff,0x9a9384,.85); scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff2dc,.75); sun.position.set(12,25,8); scene.add(sun);
 const mq=matchMedia("(prefers-color-scheme: dark)");
 function isDark(){const t=document.documentElement.dataset.theme; return t? t==="dark" : mq.matches;}
-function applySky(){ const d=isDark(); scene.background=new THREE.Color(d?0x1b2433:0xbcd3e8); hemi.intensity=d?.5:.85; sun.intensity=d?.4:.75; }
+function applySky(){ const d=isDark(), n=$("night")?$("night").checked:true;
+  if(n){ scene.background=new THREE.Color(0x0b1020); hemi.intensity=.22; sun.intensity=.06; }
+  else { scene.background=new THREE.Color(d?0x1b2433:0xbcd3e8); hemi.intensity=d?.5:.85; sun.intensity=d?.4:.75; } }
 try{ mq.addEventListener("change",applySky); new MutationObserver(applySky).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]}); }catch(e){}
 applySky();
 
 const M=c=>new THREE.MeshStandardMaterial({color:c,roughness:.9});
-const mWall=M(0xe6cf86), mCol=M(0x8f9aaa), mWhite=M(0xeceae4), mFloor=M(0xb9bcbd), mDark=M(0x3b2e25), mBeam=M(0x4a3426);
+const mWall=M(0xd7e3ec), mCol=M(0xeef0ee), mWhite=M(0xf5f5f1), mFloor=M(0xc9cdcf), mDark=M(0x3b2e25), mBeam=M(0x4a3426);
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(40,40),mFloor); floor.rotation.x=-Math.PI/2; scene.add(floor);
 // Building: the 2nd-floor floor (where the railing starts) sits at H_CABLE, so the cable and fabric start there.
 const DEPTH=3, BAYS=3, bay=SIDE/BAYS, L1=H_CABLE, C1=L1-.4, C2=3.6, TOP=L1+C2+.4;
@@ -634,7 +794,8 @@ let cableGroup=null;
 function buildCables(){
   dispose(cableGroup); cableGroup=new THREE.Group(); cableGroup.visible=$("cables").checked; scene.add(cableGroup);
   const H=roofH(), R=.028, bayW=SIDE/3, pz=-A-.21;
-  for(let s=0;s<4;s++){
+  const RG=rig();
+  for(let s=0;s<4;s++){ if(!RG.sideOn[s]) continue;
     const g=new THREE.Group(); g.rotation.y=s*Math.PI/2; cableGroup.add(g);
     rod(V3(-A,H,-A),V3(A,H,-A),R,mSteel,g);                          // cable perimetral de este lado
     loop(-A,pz,H+.12,.23,.025,mSteel,g);                              // anclaje en pilar de esquina
@@ -644,14 +805,36 @@ function buildCables(){
       const tb=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.14,8),mHw); tb.position.set(px,H+.12,-A-.01); g.add(tb); }
   }
   const C=V3(0,cy(),0);
-  [[-A,-A],[A,-A],[A,A],[-A,A]].forEach(([x,z])=>rod(V3(x,H,z),C,R,mSteel,cableGroup));   // X: 4 medias diagonales
+  if(RG.center==="X") [[-A,-A],[A,-A],[A,A],[-A,A]].forEach(([x,z])=>rod(V3(x,H,z),C,R,mSteel,cableGroup));   // X: 4 medias diagonales
+  else [[-A,0],[A,0]].forEach(([x,z])=>rod(V3(x,H,z),C,R,mTie,cableGroup));                                    // V2: un cable por el centro
+  if(RG.axis) [[-A,0],[A,0],[0,-A],[0,A]].forEach(([x,z])=>rod(V3(x,H,z),C,R,mSteel,cableGroup));   // cruz (+)
   const ring=new THREE.Mesh(new THREE.TorusGeometry(.18,.035,10,36),mHw); ring.rotation.x=Math.PI/2; ring.position.copy(C); cableGroup.add(ring);
 }
 
 // roof fabric
 let fabricGroup=null;
+function fabricMat(m,hi){ const f=st[m];
+  return new THREE.MeshStandardMaterial({color:new THREE.Color(hi?"#d9a73a":f.color),roughness:.75,side:THREE.DoubleSide,transparent:true,
+    opacity:hi?.95:PRESETS[f.preset].op,depthWrite:false,emissive:hi?0x5a3d00:0x2a2620,emissiveIntensity:.35}); }
+function addGrid(pos,U,V,mat,order){ const idx=[]; for(let i=0;i<U;i++) for(let j=0;j<V;j++){ const a=i*(V+1)+j,b=a+V+1; idx.push(a,b,a+1,b,b+1,a+1); }
+  const geo=new THREE.BufferGeometry(); geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3)); geo.setIndex(idx); geo.computeVertexNormals();
+  const mesh=new THREE.Mesh(geo,mat); mesh.renderOrder=order; fabricGroup.add(mesh); }
+function buildFabricV(){
+  const folds=Math.max(1,Math.round(st.full*1.5)), amp=.04+.06*(st.full-1), lift={B:.03,G:.015,A:0}, cl=x=>Math.max(-A,Math.min(A,x));
+  roofPieces().forEach((p,pi)=>{ const hi=st.one&&pi===0, mat=fabricMat(p.m,hi), off=lift[p.m]||0;
+    if(p.kind==="wave"){ const t0=p.sp[0].t, Lt=p.sp[p.sp.length-1].t-t0, U=Math.max(10,Math.round(Lt*5)), V=8, pos=[];
+      for(let i=0;i<=U;i++){ const t=t0+Lt*i/U, y=profileAt(p.sp,t); for(let j=0;j<=V;j++){ const v=-1+2*j/V;
+        pos.push(cl(p.o[0]+p.d[0]*t+p.n[0]*p.hw*v), y-amp*Math.abs(Math.sin((v+1)/2*Math.PI*folds))-off, cl(p.o[1]+p.d[1]*t+p.n[1]*p.hw*v)); } }
+      addGrid(pos,U,V,mat,hi?2:1); }
+    else [0,4*p.h].forEach(o=>{ const U=16, V=6, pos=[];
+      for(let i=0;i<=U;i++){ const u=i/U; for(let j=0;j<=V;j++){ const v=j/V, pe=cellPt(p.h,p.s0+o+(p.s1-p.s0)*v), r=Math.hypot(pe[0],pe[1]), e=fanEdge(p.cx,p.cz,pe[0],pe[1]);
+        const y=e.y+(p.yc-e.y)*u-4*(st.sag*r/A)*u*(1-u)-amp*Math.pow(1-u,.8)*Math.abs(Math.sin(v*Math.PI*folds))-off;
+        pos.push(p.cx+pe[0]*(1-u), y, p.cz+pe[1]*(1-u)); } }
+      addGrid(pos,U,V,mat,hi?2:1); }); });
+}
 function buildFabric(){
   dispose(fabricGroup); fabricGroup=new THREE.Group(); scene.add(fabricGroup);
+  if(!isV1()){ buildFabricV(); return; }
   const {strips}=layout(), U=28, V=Math.max(8,Math.round(6*st.full));
   const folds=Math.max(1,Math.round(st.full*1.5)), amp=.05+.07*(st.full-1);
   strips.forEach((x,si)=>{ [0,HALF].forEach(off=>{
@@ -660,7 +843,7 @@ function buildFabric(){
     for(let i=0;i<=U;i++){ const u=i/U; for(let j=0;j<=V;j++){ const v=j/V;
       const pe=perimPoint(x.s0+off+v*seg);
       const pleat=st.full>1.05?-amp*Math.pow(1-u,.8)*Math.abs(Math.sin(v*Math.PI*folds)):0; // pliegues cuelgan bajo el cable
-      pos.push(pe[0]*(1-u), roofY(pe[0],pe[1],u,profs[j])+pleat-(x.m==="B"?.03:0), pe[1]*(1-u)); } }
+      pos.push(pe[0]*(1-u), roofY(pe[0],pe[1],u,profs[j])+pleat-(x.m==="B"?.03:x.m==="G"?.015:0), pe[1]*(1-u)); } }
     for(let i=0;i<U;i++) for(let j=0;j<V;j++){ const a=i*(V+1)+j,b=a+V+1; idx.push(a,b,a+1,b,b+1,a+1); }
     const geo=new THREE.BufferGeometry(); geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3)); geo.setIndex(idx); geo.computeVertexNormals();
     const hi=st.one&&si===0, f=st[x.m];
@@ -670,26 +853,30 @@ function buildFabric(){
 }
 
 // mosquitero + lámpara
-let netGroup=null; const lampLight=new THREE.PointLight(0xffc977,1.1,14,2); scene.add(lampLight);
+let netGroup=null; const lampLight=new THREE.Object3D();          // la esfera no emite luz; la iluminan los proyectores
+// proyectores en el piso: 4 hacia las caras de la carpa y 4 en las esquinas hacia el techo
+const projGroup=new THREE.Group(); scene.add(projGroup);
+const mProj=new THREE.MeshStandardMaterial({color:0x22262c,metalness:.5,roughness:.45});
+function projector(pos,target,color,angle,dist,intensity){
+  const sp=new THREE.SpotLight(color,intensity,dist,angle,.5,1); sp.position.set(...pos); sp.target.position.set(...target); projGroup.add(sp,sp.target);
+  const dir=V3(...target).sub(V3(...pos)).normalize();
+  const body=new THREE.Mesh(new THREE.BoxGeometry(.32,.2,.34),mProj); body.position.set(...pos); body.lookAt(...target); projGroup.add(body);
+  const lens=new THREE.Mesh(new THREE.CircleGeometry(.075,20),new THREE.MeshBasicMaterial({color:color})); lens.position.copy(V3(...pos).addScaledVector(dir,.18)); lens.lookAt(V3(...target)); projGroup.add(lens);
+  return sp; }
+const PROJ=[];
+for(let k=0;k<4;k++){ const a=k*Math.PI/2, c=Math.cos(a), s2=Math.sin(a), d=TENT+2.4;
+  PROJ.push(projector([s2*d,.12,-c*d],[s2*TENT,2.4,-c*TENT],0xffc98a,.5,12,1.1)); }
+[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([sx,sz])=>{ const d=A-.75;
+  PROJ.push(projector([sx*d,.12,sz*d],[sx*.5,5.2,sz*.5],0xa9bcff,.5,24,1.5)); });
 function buildNet(){
   dispose(netGroup); netGroup=new THREE.Group(); scene.add(netGroup);
   fountainTop.scale.y=st.fh/3.1;
   const c=centerInfo(), sq=st.prop==="square", ti=tentInfo();
-  // polea colgada de la argolla central, cuerda al aro y a la cornamusa
-  const py=cy()-PULLEY_DROP, cl=cleatPoint(), P=V3(0,py,0), Cl=V3(...cl);
-  rod(V3(0,cy(),0),V3(0,py+.1,0),.02,mHw,netGroup);                                    // grillete
-  const dir=V3(cl[0],0,cl[2]).normalize(), axis=V3().crossVectors(V3(0,1,0),dir).normalize();
-  const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,.05,24),mHw); wheel.position.copy(P);
-  wheel.quaternion.setFromUnitVectors(V3(0,1,0),axis); netGroup.add(wheel);
-  const side=P.clone().addScaledVector(dir,.11);
-  rod(P.clone().addScaledVector(dir,-.11),V3(0,sq?ti.lampTop+.02:c.ring,0),.018,mRope,netGroup); // baja al aro o a la lámpara
-  rod(side,Cl,.018,mRope,netGroup);                                                     // va a la cornamusa
-  const cleat=new THREE.Mesh(new THREE.BoxGeometry(.22,.05,.06),mHw); cleat.position.set(cl[0],cl[1],cl[2]+.01); netGroup.add(cleat);
-  rod(Cl,V3(cl[0],cl[1]-.9,cl[2]),.016,mRope,netGroup);                                // cola de la cuerda
-  const mSl=new THREE.MeshStandardMaterial({color:new THREE.Color(st.D.color),roughness:.85,transparent:true,opacity:.8,emissive:0x2a2620,emissiveIntensity:.3});
-  const sleeve=(a,b)=>{ const d=V3().subVectors(b,a), L=d.length(); if(L<.35) return; const e=a.clone().addScaledVector(d,.3/L); rod(e,b,.055,mSl,netGroup); };
-  sleeve(P.clone().addScaledVector(dir,-.11),V3(0,sq?ti.lampTop+.02:c.ring,0));
-  sleeve(side,Cl);
+  // cable fijo del centro de la X a la esfera (cuadro) o al aro (círculo), con su funda
+  const top=V3(0,cy(),0), bot=V3(0,sq?ti.lampTop+.02:c.ring,0);
+  rod(top,bot,.014,mTie,netGroup);
+  const mSl=new THREE.MeshStandardMaterial({color:new THREE.Color(st.A.color),roughness:.85,transparent:true,opacity:.8,emissive:0x2a2620,emissiveIntensity:.3});
+  if(top.y-bot.y>.3) rod(V3(0,top.y-.15,0),bot,.055,mSl,netGroup);
   if(sq){ buildTent(mSl); addLamp(ti.lampTop); return; }
   const ring=new THREE.Mesh(new THREE.TorusGeometry(NET_R,.025,8,48),new THREE.MeshStandardMaterial({color:0xd8d4ca})); ring.rotation.x=Math.PI/2; ring.position.y=c.ring; netGroup.add(ring);
   const T=36,S=120,folds=22,tMax=Math.min(1,NET_LEN/c.slant), tulle=()=>new THREE.MeshStandardMaterial({color:0xffffff,roughness:.8,side:THREE.DoubleSide,transparent:true,opacity:.32,depthWrite:false,emissive:0x332a1c,emissiveIntensity:.4});
@@ -705,7 +892,7 @@ function buildNet(){
 }
 function addLamp(lampTop){
   const lampY=lampTop-LAMP_R;
-  const lamp=new THREE.Mesh(new THREE.SphereGeometry(LAMP_R,40,24),new THREE.MeshStandardMaterial({color:0xfff6e4,emissive:0xffcf80,emissiveIntensity:.9,roughness:1}));
+  const lamp=new THREE.Mesh(new THREE.SphereGeometry(LAMP_R,40,24),new THREE.MeshStandardMaterial({color:0xfbf7ee,roughness:1}));
   lamp.position.y=lampY; netGroup.add(lamp);
   for(let k=-3;k<=3;k++){ const yy=k*LAMP_R/4, rr=Math.sqrt(LAMP_R*LAMP_R-yy*yy)+.004;
     const rib=new THREE.Mesh(new THREE.TorusGeometry(rr,.004,4,48),new THREE.MeshBasicMaterial({color:0xd9b77a})); rib.rotation.x=Math.PI/2; rib.position.y=lampY+yy; netGroup.add(rib); }
@@ -730,7 +917,7 @@ function buildTent(mSl){
         pos.push(x, y, -T-out+pl*ease); } }
     for(let i=0;i<U;i++) for(let j=0;j<V;j++){ const a=i*(V+1)+j,b=a+V+1; idx.push(a,b,a+1,b,b+1,a+1); }
     const geo=new THREE.BufferGeometry(); geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3)); geo.setIndex(idx); geo.computeVertexNormals();
-    const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:new THREE.Color(st.C.color),roughness:.8,side:THREE.DoubleSide,transparent:true,
+    const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:new THREE.Color(st.A.color),roughness:.8,side:THREE.DoubleSide,transparent:true,
       opacity:Math.min(.85,PRESETS[st.C.preset].op+.1),depthWrite:false,emissive:0x2a2620,emissiveIntensity:.3}));
     m.renderOrder=3; g.add(m);
   }
@@ -748,8 +935,8 @@ new ResizeObserver(resize).observe(canvas.parentElement);
 // inputs
 function update(rebuild=true){ renderPanel(); if(rebuild) buildFabric(); }
 const updateRoof=update;
-["A","B","C","D"].forEach(m=>{
-  const update=(m==="C"||m==="D")?(()=>{ renderPanel(); buildNet(); }):updateRoof;
+["A","B","G"].forEach(m=>{
+  const update=m==="A"?((rb=true)=>{ updateRoof(rb); buildNet(); }):updateRoof;
   const sel=$("preset"+m); sel.innerHTML=Object.entries(PRESETS).map(([k,p])=>"<option value='"+k+"'>"+p.name+"</option>").join(""); sel.value=st[m].preset;
   const fill=()=>{ $("w"+m).value=st[m].w; $("roll"+m).value=st[m].roll; $("price"+m).value=st[m].price||""; $("col"+m).value=st[m].color; }; fill();
   sel.addEventListener("change",()=>{ const p=PRESETS[sel.value]; Object.assign(st[m],{preset:sel.value,w:p.w,roll:p.roll,price:p.price}); fill(); update(); });
@@ -763,10 +950,15 @@ $("sag").addEventListener("input",e=>{ st.sag=parseFloat(e.target.value); update
 $("tie").addEventListener("input",e=>{ st.tie=parseFloat(e.target.value); update(false); });
 $("one").addEventListener("change",e=>{ st.one=e.target.checked; buildFabric(); });
 $("cables").addEventListener("change",e=>{ cableGroup.visible=e.target.checked; });
+["clipsMain","clipsLight"].forEach(k=>$(k).addEventListener("input",e=>{ const v=parseInt(e.target.value,10); if(v>=1){ st[k]=v; renderPanel(); } }));
+$("useLeft").addEventListener("change",e=>{ st.useLeft=e.target.checked; renderPanel(); });
+$("night").addEventListener("change",()=>{ applySky(); projGroup.visible=true; });
 $("hl").addEventListener("change",e=>{ st.hl=e.target.checked; colorCables(); });
 $("anchor").addEventListener("change",e=>{ st.anchor=e.target.value; renderPanel(); buildNet(); });
 $("xs").addEventListener("input",e=>{ st.xs=parseFloat(e.target.value); renderPanel(); buildCables(); buildFabric(); buildNet(); });
-document.querySelectorAll(".prop button").forEach(b=>b.addEventListener("click",()=>{ st.prop=b.dataset.prop; renderPanel(); buildCables(); buildFabric(); buildNet(); }));
+document.querySelectorAll(".prop button").forEach(b=>b.addEventListener("click",()=>{ st.prop=b.dataset.prop; if(b.dataset.ver) st.ver=b.dataset.ver; renderPanel(); buildCables(); buildFabric(); buildNet(); }));
+$("use3").addEventListener("change",e=>{ st.use3=e.target.checked; update(); });
+$("waveDir").addEventListener("change",e=>{ st.waveDir=e.target.value; update(); buildCables(); });
 ["ext","tentH","tentFull","pool","sqDrop","sleeveW","sleeveG","tentSag"].forEach(k=>$(k).addEventListener("input",e=>{ st[k]=parseFloat(e.target.value); renderPanel(); buildNet(); if(k==="tentH") buildFabric(); }));
 $("buy").addEventListener("change",e=>{ const id=e.target.dataset.prod, k=e.target.dataset.k; if(!id) return; const P=PRODUCTS.find(x=>x.id===id);
   const v=parseFloat(e.target.value); P[k]=k==="price"?(v||0):(v>0?v:P[k]); saveBuy(); renderPanel(); });

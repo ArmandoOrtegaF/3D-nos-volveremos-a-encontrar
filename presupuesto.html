@@ -90,6 +90,9 @@ select.st{font:inherit;font-size:13px;border-radius:999px;padding:3px 10px;borde
 .st-porcotizar{background:var(--warn-soft);color:var(--warn)}
 .st-museo{background:var(--museo-soft);color:var(--museo)}
 .st-gratis{background:var(--ok-soft);color:var(--ok)}
+.leg{display:inline-block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;border-radius:4px;padding:1px 6px;margin-right:8px;vertical-align:1px}
+.leg-ida{background:var(--accent-soft);color:var(--accent)}
+.leg-regreso{background:var(--museo-soft);color:var(--museo)}
 .sub-cell{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
 .legend b{font-weight:500}
@@ -102,17 +105,12 @@ footer{font-size:13px;color:var(--muted);max-width:70ch}
   <header>
     <div class="eyebrow">Techo de telas · Patio con fuente 15.3 × 15.3 m</div>
     <h1>Presupuesto del montaje</h1>
-    <p class="sub">Materiales para el techo de organza y tul, la carpa central, el montaje con cable de acero y la proyección. Da click en el nombre de cada artículo para abrir el link de compra. Cantidades, precios y estado se pueden editar aquí mismo.</p>
+    <p class="sub">Materiales para el techo de organza y tul, la carpa central, el montaje con cable de acero, la proyección y los viajes. Precios de telas en tienda. Da click en el nombre de cada artículo para abrir el link de compra. Cantidades, precios y estado se pueden editar aquí mismo.</p>
   </header>
 
   <div class="totals" id="totals"></div>
 
   <div class="toolbar" data-html2canvas-ignore>
-    <span class="eyebrow">Precio de telas</span>
-    <div class="seg" role="group" aria-label="Precio de telas">
-      <button type="button" id="mode-internet" aria-pressed="true">Internet</button>
-      <button type="button" id="mode-tienda" aria-pressed="false">Tienda</button>
-    </div>
     <button type="button" class="btn" id="photo">Guardar como imagen</button>
     <button type="button" class="btn" id="copy">Copiar tabla para Excel</button>
     <button type="button" class="btn" id="reset">Restablecer valores</button>
@@ -138,56 +136,61 @@ const SECTIONS=[
  {id:"proy",name:"Proyección e iluminación"},
  {id:"suelo",name:"Suelo"},
  {id:"obj",name:"Objetos individuales"},
- {id:"trans",name:"Transporte"},
+ {id:"trans",name:"Viajes",legs:true},
  {id:"museo",name:"Lo gestiona el museo"}
 ];
 const ITEMS=[
- {id:"organza",sec:"telas",name:"Organza lisa blanca",url:"https://www.laparisina.mx/organza-lisa-liso-blanco/",det:"Rollo de 50 m. Techo (A): 228 m en 12 tiras, 6 rollos. Carpa (C): 80 m en 14 caídas de 5.7 m, 2 rollos.",qty:8,unit:"rollos",pi:1049.64,pt:1550,st:"cotizado"},
- {id:"tul",sec:"telas",name:"Tul 70 liso blanco",url:"https://www.laparisina.mx/tul-70-liso-blanco/",det:"Techo (B): 228 m en 12 tiras, 6 rollos de 50 m.",qty:6,unit:"rollos",pi:699.64,pt:999,st:"cotizado"},
+ {id:"organza",sec:"telas",name:"Organza lisa blanca",url:"https://www.laparisina.mx/organza-lisa-liso-blanco/",det:"Rollo de 50 m. Precio en tienda.",qty:5,unit:"rollos",p:1550,st:"cotizado"},
+ {id:"tul",sec:"telas",name:"Tul 70 liso blanco",url:"https://www.laparisina.mx/tul-70-liso-blanco/",det:"Rollo de 50 m. Precio en tienda.",qty:3,unit:"rollos",p:999,st:"cotizado"},
 
- {id:"cable18",sec:"cables",name:"Cable de acero 1/8\" 7x7",url:"https://www.mercadolibre.com.mx/metro-de-cable-rigido-18--de-acero-7x7-hilos-75-m-44205/up/MLMU492105999?pdp_filters=item_id%3AMLM2842542024",det:"Eje X principal. Rollo de 75 m: usas 59 m, sobran 16 m.",qty:1,unit:"rollo",p:585,st:"cotizado"},
- {id:"cable15",sec:"cables",name:"Cable de acero inoxidable 7x7 1.5 mm",url:"https://www.mercadolibre.com.mx/cable-de-acero-inoxidable-304-cable-de-acero-7x7-de-50-met/up/MLMU4155547757?pdp_filters=item_id%3AMLM5582108976",det:"Cables tensores de los lados. Rollos de 50 m: usas 191 de 200 m, sobran 9 m.",qty:4,unit:"rollos",p:178,st:"cotizado"},
- {id:"perros",sec:"cables",name:"Nudos perros para cable",url:"https://www.mercadolibre.com.mx/kit-de-50-nudos-perros-de-hierro-para-cable-de-acero-316/up/MLMU3759112544?pdp_filters=item_id:MLM2711519995",det:"Kit de 50 piezas.",qty:1,unit:"kit",p:228.99,st:"cotizado"},
- {id:"cinchos",sec:"cables",name:"Cinchos de plástico, paquete x100",url:"https://www.amazon.com.mx/dp/B0C2KXDLGT",det:"Para sujetar telas a los cables.",qty:1,unit:"paquete",p:160,st:"cotizado"},
+ {id:"cable18",sec:"cables",name:"Cable de acero 1/8\" 7x7",url:"https://www.mercadolibre.com.mx/metro-de-cable-rigido-18--de-acero-7x7-hilos-75-m-44205/up/MLMU492105999?pdp_filters=item_id%3AMLM2842542024",det:"Eje X principal. Rollo de 75 m.",qty:1,unit:"rollo",p:585,st:"cotizado"},
+ {id:"cable15",sec:"cables",name:"Cable de acero inoxidable 7x7 1.5 mm",url:"https://www.mercadolibre.com.mx/cable-de-acero-inoxidable-304-cable-de-acero-7x7-de-50-met/up/MLMU4155547757?pdp_filters=item_id%3AMLM5582108976",det:"Cables tensores de los lados. Rollos de 50 m.",qty:3,unit:"rollos",p:178,st:"cotizado"},
+ {id:"perros",sec:"cables",name:"Nudos perros para cable",url:"https://www.mercadolibre.com.mx/kit-de-50-nudos-perros-de-hierro-para-cable-de-acero-316/up/MLMU3759112544?pdp_filters=item_id:MLM2711519995",det:"Kit de 50 piezas.",qty:2,unit:"kits",p:228.99,st:"cotizado"},
+ {id:"cinchos",sec:"cables",name:"Cinchos de plástico, paquete x100",url:"https://www.amazon.com.mx/dp/B0C2KXDLGT",det:"Para sujetar telas a los cables.",qty:1,unit:"paquete",p:0,st:"porcotizar"},
 
- {id:"proyector",sec:"proy",name:"Proyector Magcubic HY300 Pro",url:"https://www.mercadolibre.com.mx/magcubic-portatil-projetor-hy300pro-mini-smart-tv-android-14-290ansi-lumens-bluetooth-54-wi-fi-6-full-hd-8k-hdmi-usb-cinema-home/p/MLM63864225",det:"Mini proyector portátil, 290 ANSI lúmenes.",qty:2,unit:"pzas",p:807.86,st:"cotizado",flag:"Confirmar si $807.86 es por pieza o por las dos"},
- {id:"tripie",sec:"proy",name:"Trípode flexible para proyector",url:"https://www.mercadolibre.com.mx/tripode-flexible-magcubic-projector-soporte-de-suelo-de-14/up/MLMU4182150489?pdp_filters=item_id:MLM5613111374",det:"Para la carpa.",qty:2,unit:"pzas",p:143,st:"cotizado",flag:"Confirmar si $143 es por pieza"},
- {id:"usb",sec:"proy",name:"Memorias USB 8 GB, pack de 10",url:"https://www.mercadolibre.com.mx/memoria-usb-8gb-20-pack-10-4geek-plateada-liso/p/MLM44213070",det:"Para los videos.",qty:1,unit:"pack",p:589,st:"cotizado"},
+ {id:"proyector",sec:"proy",name:"Proyector Magcubic HY300 Pro",url:"https://www.mercadolibre.com.mx/magcubic-portatil-projetor-hy300pro-mini-smart-tv-android-14-290ansi-lumens-bluetooth-54-wi-fi-6-full-hd-8k-hdmi-usb-cinema-home/p/MLM63864225",det:"Mini proyector portátil, 290 ANSI lúmenes.",qty:2,unit:"pzas",p:822.99,st:"cotizado"},
+ {id:"tripie",sec:"proy",name:"Trípode flexible para proyector",url:"https://www.mercadolibre.com.mx/tripode-flexible-magcubic-projector-soporte-de-suelo-de-14/up/MLMU4182150489?pdp_filters=item_id:MLM5613111374",det:"Para la carpa.",qty:2,unit:"pzas",p:143,st:"cotizado"},
+ {id:"usb",sec:"proy",name:"Memorias USB Stylos 8 GB, kit de 10",url:"https://www.mercadolibre.com.mx/kit-10-memorias-usb-stylos-8gb-20-metalica-plata-stmusb1b/up/MLMU869998938",det:"Para los videos.",qty:1,unit:"kit",p:600,st:"cotizado"},
  {id:"reflectores",sec:"proy",name:"Reflectores LED RGB 36x1 DMX, 2 piezas",url:"https://www.mercadolibre.com.mx/geallmg-2-canon-de-leds-36x1-rgb-audio-ritmico-multicolor-dmx-2-pz/p/MLM62791181",det:"Cañones LED multicolor.",qty:0,unit:"juego",p:437,st:"cotizado"},
  {id:"hdmi",sec:"proy",name:"Cables HDMI",det:"",qty:3,unit:"pzas",p:0,st:"museo"},
  {id:"dvd",sec:"proy",name:"Reproductores de video (DVD)",det:"",qty:3,unit:"pzas",p:0,st:"museo"},
  {id:"ext",sec:"proy",name:"Extensiones de 6 m",det:"",qty:4,unit:"pzas",p:0,st:"museo"},
  {id:"multi",sec:"proy",name:"Multicontactos",det:"",qty:2,unit:"pzas",p:0,st:"museo"},
 
- {id:"cojines",sec:"suelo",name:"Cojines de hule espuma",det:"Cantidad por definir.",qty:1,unit:"pzas",p:0,st:"porcotizar"},
+ {id:"cojines",sec:"suelo",name:"Cojines de hule espuma",det:"",qty:0,unit:"pzas",p:0,st:"porcotizar"},
  {id:"bancas",sec:"suelo",name:"Bancas",det:"",qty:4,unit:"pzas",p:0,st:"museo"},
  {id:"tapetes",sec:"suelo",name:"Tapetes para yoga",det:"",qty:1,unit:"pzas",p:0,st:"museo"},
 
  {id:"lampara",sec:"obj",name:"Lámpara de papel plegable",url:"https://www.amazon.com.mx/dp/B0FC632T89",det:"Lámpara central, sin luz: se proyecta sobre ella.",qty:1,unit:"pza",p:704.57,st:"cotizado"},
 
- {id:"viajes",sec:"trans",name:"Viaje para 2 personas",det:"Ida y regreso, cada viaje cuesta lo mismo: $2,700 por las dos personas.",qty:2,unit:"viajes",p:2700,st:"cotizado"},
+ {id:"ida-slp-cdmx",sec:"trans",leg:"ida",name:"Camión SLP → CDMX",det:"Ida. Precio por persona.",qty:2,unit:"personas",p:975,st:"cotizado"},
+ {id:"ida-cdmx-ver",sec:"trans",leg:"ida",name:"Camión CDMX → Veracruz",det:"Ida. Precio por persona.",qty:2,unit:"personas",p:600,st:"cotizado"},
+ {id:"reg-ver-cdmx",sec:"trans",leg:"regreso",name:"Camión Veracruz → CDMX",det:"Regreso. Precio por persona.",qty:2,unit:"personas",p:600,st:"cotizado"},
+ {id:"reg-cdmx-slp",sec:"trans",leg:"regreso",name:"Camión CDMX → SLP",det:"Regreso. Precio por persona.",qty:2,unit:"personas",p:975,st:"cotizado"},
+ {id:"traslados",sec:"trans",name:"Traslados",det:"Traslados locales.",qty:1,unit:"monto",p:400,st:"cotizado"},
 
  {id:"bocinas",sec:"museo",name:"Bocinas",det:"",qty:4,unit:"pzas",p:0,st:"museo"}
 ];
 const ST={cotizado:"Cotizado",porcotizar:"Por cotizar",museo:"Lo tiene el museo",gratis:"Gratis"};
-const KEY="presupuesto-montaje-v3";
+const KEY="presupuesto-montaje-v6";
 const fmt=n=>"$"+n.toLocaleString("es-MX",{minimumFractionDigits:2,maximumFractionDigits:2});
 
-let state={mode:"internet",items:{}};
+let state={items:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.items)state=s;}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
 function get(it){return Object.assign({},it,state.items[it.id]||{});}
 function setv(id,k,v){state.items[id]=Object.assign({},state.items[id],{[k]:v});save();}
-function unitPrice(it,mode){return it.pi!==undefined?(mode==="tienda"?it.pt:it.pi):it.p;}
-function sub(it,mode){return it.st==="cotizado"?(Number(it.qty)||0)*(Number(unitPrice(it,mode))||0):0;}
-function total(mode,sec){return ITEMS.filter(i=>!sec||i.sec===sec).map(get).reduce((a,i)=>a+sub(i,mode),0);}
+function sub(it){return it.st==="cotizado"?(Number(it.qty)||0)*(Number(it.p)||0):0;}
+function total(sec,leg){return ITEMS.filter(i=>(!sec||i.sec===sec)&&(!leg||i.leg===leg)).map(get).reduce((a,i)=>a+sub(i),0);}
 
 function renderTotals(){
-  const pend=ITEMS.map(get).filter(i=>i.st==="porcotizar").length;
+  const pend=ITEMS.map(get).filter(i=>i.st==="porcotizar"&&Number(i.qty)>0).length;
+  const viajes=total("trans"),all=total();
   const el=document.getElementById("totals");
   el.innerHTML=`
-   <div class="tot ${state.mode==="internet"?"main":""}"><span class="lab">Total · telas por internet</span><span class="val">${fmt(total("internet"))}</span><span class="note">Telas: ${fmt(total("internet","telas"))}</span></div>
-   <div class="tot ${state.mode==="tienda"?"main":""}"><span class="lab">Total · telas en tienda</span><span class="val">${fmt(total("tienda"))}</span><span class="note">Telas: ${fmt(total("tienda","telas"))}</span></div>
+   <div class="tot main"><span class="lab">Total del montaje</span><span class="val">${fmt(all)}</span><span class="note">Materiales + viajes</span></div>
+   <div class="tot"><span class="lab">Materiales</span><span class="val">${fmt(all-viajes)}</span><span class="note">Telas: ${fmt(total("telas"))}</span></div>
+   <div class="tot"><span class="lab">Viajes</span><span class="val">${fmt(viajes)}</span><span class="note">Ida ${fmt(total("trans","ida"))} · Regreso ${fmt(total("trans","regreso"))} · Traslados ${fmt(viajes-total("trans","ida")-total("trans","regreso"))}</span></div>
    <div class="tot"><span class="lab">Por cotizar</span><span class="val">${pend}</span><span class="note">artículos sin precio, fuera del total</span></div>
    <div class="tot"><span class="lab">Lo pone el museo</span><span class="val">${ITEMS.map(get).filter(i=>i.st==="museo").length}</span><span class="note">artículos que debe tener el lugar</span></div>`;
 }
@@ -197,26 +200,21 @@ function renderSections(){
   box.innerHTML=SECTIONS.map(s=>{
     const rows=ITEMS.filter(i=>i.sec===s.id).map(get).map(it=>{
       const nm=it.url?`<a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.name)}</a>`:`<span>${esc(it.name)}</span>`;
-      const fab=it.pi!==undefined;
-      const priceCell=fab?`<div class="pair">
-          <div class="row ${state.mode==="internet"?"":"dim"}"><span class="lbl">Internet</span><input class="n price" id="pi-${it.id}" data-id="${it.id}" data-k="pi" type="number" step="0.01" min="0" value="${it.pi}"></div>
-          <div class="row ${state.mode==="tienda"?"":"dim"}"><span class="lbl">Tienda</span><input class="n price" id="pt-${it.id}" data-id="${it.id}" data-k="pt" type="number" step="0.01" min="0" value="${it.pt}"></div></div>`
-        :`<input class="n price" id="p-${it.id}" data-id="${it.id}" data-k="p" type="number" step="0.01" min="0" value="${it.p||""}" placeholder="—">`;
-      const subCell=it.st==="cotizado"?fmt(sub(it,state.mode)):(it.st==="porcotizar"?"—":fmt(0));
+      const priceCell=`<input class="n price" id="p-${it.id}" data-id="${it.id}" data-k="p" type="number" step="0.01" min="0" value="${it.p||""}" placeholder="—">`;
+      const subCell=it.st==="cotizado"?fmt(sub(it)):(it.st==="porcotizar"?"—":fmt(0));
       return `<tr>
-        <td class="name">${nm}${it.det?`<div class="det">${esc(it.det)}</div>`:""}${it.flag?`<span class="flag">Revisar: ${esc(it.flag)}</span>`:""}</td>
+        <td class="name">${it.leg?`<span class="leg leg-${it.leg}">${it.leg==="ida"?"Ida":"Regreso"}</span>`:""}${nm}${it.det?`<div class="det">${esc(it.det)}</div>`:""}${it.flag?`<span class="flag">Revisar: ${esc(it.flag)}</span>`:""}</td>
         <td class="r"><div class="qty"><button type="button" class="stp" id="m-${it.id}" data-id="${it.id}" data-step="-1" aria-label="Quitar uno">−</button><input class="n q" id="q-${it.id}" data-id="${it.id}" data-k="qty" type="number" min="0" step="1" value="${it.qty}" aria-label="Cantidad de ${esc(it.name)}"><button type="button" class="stp" id="a-${it.id}" data-id="${it.id}" data-step="1" aria-label="Agregar uno">+</button></div><div class="det">${esc(it.unit)}</div></td>
         <td class="r">${priceCell}</td>
         <td class="r sub-cell" id="s-${it.id}">${subCell}</td>
         <td><select class="st st-${it.st}" id="st-${it.id}" data-id="${it.id}" aria-label="Estado de ${esc(it.name)}">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===it.st?"selected":""}>${v}</option>`).join("")}</select></td>
       </tr>`;}).join("");
-    return `<section><div class="sechead"><h2>${s.name}</h2><span class="secsum">Subtotal ${fmt(total(state.mode,s.id))}</span></div>
+    const sum=s.legs?`Ida ${fmt(total(s.id,"ida"))} · Regreso ${fmt(total(s.id,"regreso"))} · Traslados ${fmt(total(s.id)-total(s.id,"ida")-total(s.id,"regreso"))} · Total ${fmt(total(s.id))}`:`Subtotal ${fmt(total(s.id))}`;
+    return `<section><div class="sechead"><h2>${s.name}</h2><span class="secsum">${sum}</span></div>
       <div class="tablebox"><table><thead><tr><th>Artículo</th><th class="r">Cantidad</th><th class="r">Precio unitario</th><th class="r">Subtotal</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
   }).join("");
 }
-function render(){renderTotals();renderSections();
-  document.getElementById("mode-internet").setAttribute("aria-pressed",state.mode==="internet");
-  document.getElementById("mode-tienda").setAttribute("aria-pressed",state.mode==="tienda");}
+function render(){renderTotals();renderSections();}
 
 document.getElementById("sections").addEventListener("change",e=>{
   const t=e.target,id=t.dataset.id;if(!id)return;
@@ -231,15 +229,15 @@ document.getElementById("sections").addEventListener("click",e=>{
   setv(it.id,"qty",Math.max(0,(Number(it.qty)||0)+Number(b.dataset.step)));
   render();const again=document.getElementById(b.id);if(again)again.focus();
 });
-document.getElementById("mode-internet").onclick=()=>{state.mode="internet";save();render();};
-document.getElementById("mode-tienda").onclick=()=>{state.mode="tienda";save();render();};
 const toast=m=>{const t=document.getElementById("toast");t.textContent=m;setTimeout(()=>t.textContent="",2500);};
-document.getElementById("reset").onclick=()=>{state={mode:"internet",items:{}};save();render();toast("Valores restablecidos");};
+document.getElementById("reset").onclick=()=>{state={items:{}};save();render();toast("Valores restablecidos");};
 document.getElementById("copy").onclick=async()=>{
   const lines=[["Sección","Artículo","Detalle","Cantidad","Unidad","Precio unitario","Subtotal","Estado","Link"].join("\t")];
   SECTIONS.forEach(s=>ITEMS.filter(i=>i.sec===s.id).map(get).forEach(it=>{
-    lines.push([s.name,it.name,it.det||"",it.qty,it.unit,unitPrice(it,state.mode)||"",it.st==="cotizado"?sub(it,state.mode).toFixed(2):"",ST[it.st],it.url||""].join("\t"));}));
-  lines.push(["","TOTAL ("+(state.mode==="tienda"?"telas en tienda":"telas por internet")+")","","","","",total(state.mode).toFixed(2),"",""].join("\t"));
+    lines.push([s.name,(it.leg?(it.leg==="ida"?"Ida · ":"Regreso · "):"")+it.name,it.det||"",it.qty,it.unit,it.p||"",it.st==="cotizado"?sub(it).toFixed(2):"",ST[it.st],it.url||""].join("\t"));}));
+  lines.push(["","Viajes · ida","","","","",total("trans","ida").toFixed(2),"",""].join("\t"));
+  lines.push(["","Viajes · regreso","","","","",total("trans","regreso").toFixed(2),"",""].join("\t"));
+  lines.push(["","TOTAL DEL MONTAJE","","","","",total().toFixed(2),"",""].join("\t"));
   const txt=lines.join("\n");
   try{await navigator.clipboard.writeText(txt);toast("Copiado. Pégalo en Excel o Google Sheets");}
   catch(e){const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Copiado");}catch(_){toast("No se pudo copiar");}ta.remove();}
